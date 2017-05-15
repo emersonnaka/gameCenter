@@ -1,6 +1,6 @@
 class Config {}
-Config.WIDTH = 1000
-Config.HEIGHT= 1000
+Config.WIDTH = 800
+Config.HEIGHT= 480
 Config.DEBUG = false
 Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
@@ -18,6 +18,7 @@ class PlayState extends Phaser.State {
 	preload() {
 		this.game.load.tilemap('level1', Config.ASSETS + 'phase1.json', null, Phaser.Tilemap.TILED_JSON)
 		this.game.load.image('tiles', Config.ASSETS + 'tiles/tiles.png')
+		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
 		this.game.load.image('background', Config.ASSETS + 'background.png')
 	}
 
@@ -36,6 +37,7 @@ class PlayState extends Phaser.State {
 	createMap() {
 		this.map = this.game.add.tilemap('level1')
         this.map.addTilesetImage('tiles')
+        this.map.addTilesetImage('objects')
 
         this.mapLayer = this.map.createLayer('Tile Layer')
         this.mapLayer.resizeWorld()
