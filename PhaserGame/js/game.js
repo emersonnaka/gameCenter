@@ -54,12 +54,16 @@ class PlayState extends Phaser.State {
 
         this.mapLayer = this.map.createLayer('Tile Layer')
 
-        this.map.setCollisionBetween(1, 18, true, 'Tile Layer')
-        this.map.setCollisionBetween(236, 239, true, 'Tile Layer')
-        this.map.setCollisionBetween(268, 271, true, 'Tile Layer')
-        this.map.setCollisionBetween(300, 303, true, 'Tile Layer')
+        this.map.setCollisionBetween(1, 13, true, 'Tile Layer')
+        this.map.setCollisionBetween(16, 18, true, 'Tile Layer')
+        this.map.setCollisionBetween(237, 239, true, 'Tile Layer')
+        this.map.setCollisionBetween(269, 271, true, 'Tile Layer')
+        this.map.setCollisionBetween(301, 303, true, 'Tile Layer')
 
         this.mapLayer.resizeWorld()
+
+        this.trapsLayer = this.map.createLayer('Trap Layer')
+        this.map.setCollision([14], true, 'Trap Layer')
 	}
 
 	createPlayer() {
@@ -89,8 +93,9 @@ class PlayState extends Phaser.State {
 	update() {
 		this.game.physics.arcade.collide(this.player, this.mapLayer)
 
-        this.game.physics.arcade.overlap(
-            this.player, this.coins, this.collectCoin, null, this)
+        this.game.physics.arcade.overlap(this.player, this.coins, this.collectCoin, null, this)
+
+        this.game.physics.arcade.collide(this.player, this.trapsLayer, this.playerDied, null, this)
 	}
 
 	collectCoin(player, coin) {
@@ -101,6 +106,12 @@ class PlayState extends Phaser.State {
 	addScore(amount) {
 		this.score += amount
 		this.scoreText.text = 'Coins: ' + this.score
+	}
+
+	playerDied() {
+		this.player.x = 30
+		this.player.y = 900
+		this.camera.shake(0.02, 200)
 	}
 
 	render() {
