@@ -1,7 +1,7 @@
 class Config {}
 Config.WIDTH = 800
 Config.HEIGHT= 480
-Config.DEBUG = true
+Config.DEBUG = false
 Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
 
@@ -64,6 +64,7 @@ class PlayState extends Phaser.State {
 
         this.trapsLayer = this.map.createLayer('Trap Layer')
         this.map.setCollision([14], true, 'Trap Layer')
+        this.map.setCollision([19], true, 'Trap Layer')
 	}
 
 	createPlayer() {
@@ -81,9 +82,9 @@ class PlayState extends Phaser.State {
 		this.headImage = this.game.add.image(0, 0, 'head')
 		this.headImage.fixedToCamera = true
 
-		this.nameText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
-        this.nameText.text = 'Irineu';
-        this.nameText.fixedToCamera = true; 
+		this.lifeText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
+        this.lifeText.text = 'Irineu: 3';
+        this.lifeText.fixedToCamera = true; 
 
         this.scoreText = this.game.add.text(60, 30, '', { fontSize: "16px", fill: '#000000' });
         this.scoreText.text = 'Coins: 0'
@@ -112,6 +113,13 @@ class PlayState extends Phaser.State {
 		this.player.x = 30
 		this.player.y = 900
 		this.camera.shake(0.02, 200)
+
+		this.subLife(this.lifes)
+	}
+
+	subLife() {
+		this.player.subLife()
+		this.lifeText.text = 'Irineu: ' + this.player.lifes
 	}
 
 	render() {
