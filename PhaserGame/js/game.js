@@ -37,6 +37,8 @@ class PlayState extends Phaser.State {
         this.keys = this.game.input.keyboard.createCursorKeys()
         this.game.physics.arcade.gravity.y = 550
 
+        this.score = 0
+
         this.createMap()
         this.createPlayer()
         this.createCoins()
@@ -76,13 +78,31 @@ class PlayState extends Phaser.State {
 	createHud() {
 		this.headImage = this.game.add.image(0, 0, 'head')
 		this.headImage.fixedToCamera = true
-		this.scoreText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
-        this.scoreText.text = 'Irineu';
-        this.scoreText.fixedToCamera = true; 
+
+		this.nameText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
+        this.nameText.text = 'Irineu';
+        this.nameText.fixedToCamera = true; 
+
+        this.scoreText = this.game.add.text(60, 30, '', { fontSize: "16px", fill: '#000000' });
+        this.scoreText.text = 'Coins: 0'
+        this.scoreText.fixedToCamera = true
 	}
 
 	update() {
 		this.game.physics.arcade.collide(this.player, this.mapLayer)
+
+        this.game.physics.arcade.overlap(
+            this.player, this.coins, this.collectCoin, null, this)
+	}
+
+	collectCoin(player, coin) {
+		coin.destroy()
+		this.addScore(coin.points)
+	}
+
+	addScore(amount) {
+		this.score += amount
+		this.scoreText.text = 'Coins: ' + this.score
 	}
 
 	render() {

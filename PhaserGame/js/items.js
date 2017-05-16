@@ -6,7 +6,7 @@ class Coin extends Phaser.Sprite {
         this.autoCull = true
         this.points = 1
 
-        this.animations.add('coin', [0], 10, true)
-        this.animations.play('coin')
+        this.animations.add('spin', [0, 1, 2, 3, 4, 5], 10, true)
+        this.animations.play('spin')
     }
 }

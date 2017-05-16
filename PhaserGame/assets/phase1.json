@@ -15,7 +15,39 @@
          "draworder":"topdown",
          "height":50,
          "name":"Collection Layer",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":467,
+                 "height":32,
+                 "id":7,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":229,
+                 "y":973
+                }, 
+                {
+                 "gid":467,
+                 "height":32,
+                 "id":8,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":306,
+                 "y":972
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -23,7 +55,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":7,
+ "nextobjectid":9,
  "orientation":"orthogonal",
  "properties":
     {
@@ -65,6 +97,23 @@
          "tileheight":21,
          "tilewidth":21,
          "transparentcolor":"#0055ff"
+        }, 
+        {
+         "firstgid":467,
+         "image":"objects\/Golds.png",
+         "imageheight":32,
+         "imagewidth":192,
+         "margin":0,
+         "name":"collection",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32,
+         "transparentcolor":"#ff00ff"
         }],
  "tilewidth":21,
  "version":1,
