@@ -7,9 +7,9 @@ class Player extends Phaser.Sprite {
         this.body.setSize(38, 45, 5, 11)
         this.anchor.setTo(0.5, 0.5)
 
-        this.animations.add('jump', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 30, true)
-        this.animations.add('idle', [9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 10, true)
-        this.animations.add('walk', [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 10, true)
+        this.animations.add('idle', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, true)
+        this.animations.add('run', [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 10, true)
+        this.animations.add('jump', [20], 10, true)
 
         let jumpButton = this.game.input.keyboard.addKey(
             Phaser.Keyboard.SPACEBAR)
@@ -30,7 +30,7 @@ class Player extends Phaser.Sprite {
     animate() {
     	// Andando ou parado
     	if (this.body.velocity.x != 0)
-            this.animations.play('walk')
+            this.animations.play('run')
         else
             this.animations.play('idle')
 
