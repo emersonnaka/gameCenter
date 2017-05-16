@@ -1,6 +1,6 @@
 class Config {}
 Config.WIDTH = 800
-Config.HEIGHT= 400
+Config.HEIGHT= 480
 Config.DEBUG = true
 Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
