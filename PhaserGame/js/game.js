@@ -24,7 +24,7 @@ class PlayState extends Phaser.State {
 		this.game.load.image('head', Config.ASSETS + 'character/Head.png')
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
 
-		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/Gold_1.png', 30, 30)
+		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/Golds.png', 32, 32)
 	}
 
 	create() {
@@ -58,9 +58,7 @@ class PlayState extends Phaser.State {
         this.map.setCollisionBetween(236, 239, true, 'Tile Layer')
         this.map.setCollisionBetween(268, 271, true, 'Tile Layer')
         this.map.setCollisionBetween(300, 303, true, 'Tile Layer')
-        // this.map.setCollisionBetween(6, 8, true, 'Tile Layer')
-        // this.map.setCollisionBetween(10, 13, true, 'Tile Layer')
-        // this.map.setCollisionBetween(16, 18, true, 'Tile Layer')
+
         this.mapLayer.resizeWorld()
 	}
 
