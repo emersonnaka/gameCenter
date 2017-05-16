@@ -23,6 +23,8 @@ class PlayState extends Phaser.State {
 
 		this.game.load.image('head', Config.ASSETS + 'character/Head.png')
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
+
+		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/Gold_1.png', 30, 30)
 	}
 
 	create() {
@@ -37,6 +39,7 @@ class PlayState extends Phaser.State {
 
         this.createMap()
         this.createPlayer()
+        this.createCoins()
         this.createHud()
 
         let keys = this.game.input.keyboard.createCursorKeys()
@@ -65,8 +68,9 @@ class PlayState extends Phaser.State {
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1)
 	}
 
-	update() {
-		this.game.physics.arcade.collide(this.player, this.mapLayer)
+	createCoins() {
+		this.coins = this.game.add.group()
+		this.map.createFromObjects('Collection Layer', 467, 'coin', 0, true, false, this.coins, Coin)
 	}
 
 	createHud() {
@@ -75,6 +79,10 @@ class PlayState extends Phaser.State {
 		this.scoreText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
         this.scoreText.text = 'Irineu';
         this.scoreText.fixedToCamera = true; 
+	}
+
+	update() {
+		this.game.physics.arcade.collide(this.player, this.mapLayer)
 	}
 
 	render() {
