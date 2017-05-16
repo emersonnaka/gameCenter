@@ -50,9 +50,9 @@ class PlayState extends Phaser.State {
         this.mapLayer = this.map.createLayer('Tile Layer')
 
         this.map.setCollisionBetween(1, 18, true, 'Tile Layer')
-        this.map.setCollisionBetween(218, 220, true, 'Tile Layer')
-        this.map.setCollisionBetween(250, 252, true, 'Tile Layer')
-        this.map.setCollisionBetween(282, 284, true, 'Tile Layer')
+        this.map.setCollisionBetween(236, 239, true, 'Tile Layer')
+        this.map.setCollisionBetween(268, 271, true, 'Tile Layer')
+        this.map.setCollisionBetween(300, 303, true, 'Tile Layer')
         // this.map.setCollisionBetween(6, 8, true, 'Tile Layer')
         // this.map.setCollisionBetween(10, 13, true, 'Tile Layer')
         // this.map.setCollisionBetween(16, 18, true, 'Tile Layer')
@@ -72,8 +72,8 @@ class PlayState extends Phaser.State {
 	createHud() {
 		this.headImage = this.game.add.image(0, 0, 'head')
 		this.headImage.fixedToCamera = true
-		this.scoreText = this.game.add.text(16, 16, '', { fontSize: "16px", fill: '#ffffff' });
-        this.scoreText.text = "COINS: 0";
+		this.scoreText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
+        this.scoreText.text = 'Irineu';
         this.scoreText.fixedToCamera = true; 
 	}
 
