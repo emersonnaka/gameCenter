@@ -21,7 +21,7 @@ class PlayState extends Phaser.State {
 		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
 		this.game.load.image('background', Config.ASSETS + 'background.png')
 
-		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 75, 90)
+		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
 	}
 
 	create() {
@@ -48,6 +48,9 @@ class PlayState extends Phaser.State {
         this.mapLayer = this.map.createLayer('Tile Layer')
 
         this.map.setCollisionBetween(1, 18, true, 'Tile Layer')
+        this.map.setCollisionBetween(218, 220, true, 'Tile Layer')
+        this.map.setCollisionBetween(250, 252, true, 'Tile Layer')
+        this.map.setCollisionBetween(282, 284, true, 'Tile Layer')
         // this.map.setCollisionBetween(6, 8, true, 'Tile Layer')
         // this.map.setCollisionBetween(10, 13, true, 'Tile Layer')
         // this.map.setCollisionBetween(16, 18, true, 'Tile Layer')
@@ -55,7 +58,7 @@ class PlayState extends Phaser.State {
 	}
 
 	createPlayer() {
-		this.player = new Player(this.game, this.keys, 50, 100, 'character')
+		this.player = new Player(this.game, this.keys, 30, 900, 'character')
 		this.game.add.existing(this.player)
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1)
 	}
