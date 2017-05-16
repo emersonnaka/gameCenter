@@ -1,13 +1,11 @@
-package webserver;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+//import java.sql.Statement;
+//import java.util.ArrayList;
+//import java.util.List;
 
 public class DAO {
 
@@ -17,7 +15,7 @@ public class DAO {
     private static final String userName = "root";
     private static final String password = "root";
 
-    public static boolean addPlayer(int id, String nome, String email) {
+    /*public static boolean addPlayer(int id, String nome, String email) {
         Connection conexao = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
@@ -26,7 +24,7 @@ public class DAO {
             Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
             Statement statement = conexao.createStatement();
-            String sql = "INSERT INTO Player(id, nome, email) VALUES (" + id + ",'" + nome + "','" + email + "')";
+            String sql = "INSERT INTO Player(id, name, email) VALUES (" + id + ",'" + nome + "','" + email + "')";
 
             statement.execute(sql);
             statement.close();
@@ -36,59 +34,43 @@ public class DAO {
             System.out.println("Erro : " + ex.getMessage());
             return false;
         }
-    }
+    }*/
+    
+    /*public static boolean addTrophy(String name, int xp, String title, String description) {
+        Connection conexao = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
 
-    public static boolean verificaPlayer(int id) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+        try {
+            Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            Statement statement = conexao.createStatement();
+            String sql = "INSERT INTO trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
+
+            statement.execute(sql);
+            statement.close();
+            return true;
+
+        } catch (Exception ex) {
+            System.out.println("Erro : " + ex.getMessage());
+            return false;
+        }
+    }*/
+
+    /*public static boolean verificaPlayer(int id) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         Connection conexao = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
 
         Class.forName(driver).newInstance();
         conexao = DriverManager.getConnection(url + dbName, userName, password);
-        pst = conexao.prepareStatement("select Player.id from player where Player.id = " + "" + id + "");
+        pst = conexao.prepareStatement("select idplayer from Player where Player.id = " + "" + id + "");
         rs = pst.executeQuery();
 
         if (rs != null) {
             return true;
         } else {
             return false;
-        }
-    }
-    
-    public static boolean addTrophy(String name, int xp, String title, String description) {
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        try {
-            Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = conexao.createStatement();
-            String sql = "INSERT INTO Trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
-
-            statement.execute(sql);
-            statement.close();
-            return true;
-
-        } catch (Exception ex) {
-            System.out.println("Erro : " + ex.getMessage());
-            return false;
-        }
-    }
-    
-    /*public static ArrayList<Trophy> listTrophy() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException{
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-        
-        Class.forName(driver).newInstance();
-        conexao = DriverManager.getConnection(url + dbName, userName, password);
-        pst = conexao.prepareStatement("SELECT * from Trophy");
-        
-        
-        rs = pst.executeQuery();
-        while (rs.next()){
-            
         }
     }*/
 
@@ -105,13 +87,13 @@ public class DAO {
         String aux = "";
         while (rs.next()) {
             aux = "{id:" + String.valueOf(rs.getInt("Player.id"));
-            aux += ", nome:" + rs.getString("nome");
+            aux += ", name:" + rs.getString("name");
             aux += ", email:" + rs.getString("email") + "}";
         }
         return aux;
     }
 
-    public static boolean atualizarUsuario(int id, String nome, String email) {
+    /*public static boolean atualizarUsuario(int id, String nome, String email) {
         Connection conexao = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
@@ -120,7 +102,7 @@ public class DAO {
             Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
             try (Statement statement = conexao.createStatement()) {
-                String sql = "UPDATE Player SET nome='" + nome + "', email='" + email + "' where Player.id = " + id + "";
+                String sql = "UPDATE Player SET name='" + nome + "', email='" + email + "' where Player.id = " + id + "";
                 statement.execute(sql);
             }
             return true;
@@ -129,5 +111,6 @@ public class DAO {
             System.out.println("Erro : " + ex.getMessage());
             return false;
         }
-    }
+    }*/
+
 }
