@@ -56,4 +56,8 @@ class Player extends Phaser.Sprite {
         this.lifes -= 1
     }
 
+    addLife() {
+        this.lifes += 1
+    }
+
 }

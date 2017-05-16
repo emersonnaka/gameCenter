@@ -25,6 +25,7 @@ class PlayState extends Phaser.State {
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
 
 		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/Golds.png', 32, 32)
+		this.game.load.spritesheet('lifes', Config.ASSETS + 'objects/lifes.png', 32, 32)
 	}
 
 	create() {
@@ -41,7 +42,7 @@ class PlayState extends Phaser.State {
 
         this.createMap()
         this.createPlayer()
-        this.createCoins()
+        this.createCollections()
         this.createHud()
 
         let keys = this.game.input.keyboard.createCursorKeys()
@@ -73,9 +74,12 @@ class PlayState extends Phaser.State {
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1)
 	}
 
-	createCoins() {
+	createCollections() {
 		this.coins = this.game.add.group()
 		this.map.createFromObjects('Collection Layer', 467, 'coin', 0, true, false, this.coins, Coin)
+
+		this.life = this.game.add.group()
+		this.map.createFromObjects('Collection Layer', 473, 'lifes', 0, true, false, this.life, Life)
 	}
 
 	createHud() {
@@ -97,6 +101,8 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.overlap(this.player, this.coins, this.collectCoin, null, this)
 
         this.game.physics.arcade.collide(this.player, this.trapsLayer, this.playerDied, null, this)
+
+        this.game.physics.arcade.overlap(this.player, this.life, this.collectLife, null, this)
 	}
 
 	collectCoin(player, coin) {
@@ -107,6 +113,16 @@ class PlayState extends Phaser.State {
 	addScore(amount) {
 		this.score += amount
 		this.scoreText.text = 'Coins: ' + this.score
+	}
+
+	collectLife(player, life) {
+		life.destroy()
+		this.addLife()
+	}
+
+	addLife(amount) {
+		this.player.addLife()
+		this.lifeText.text = 'Irineu: ' + this.player.lifes
 	}
 
 	playerDied() {
