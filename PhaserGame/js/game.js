@@ -154,6 +154,7 @@ class PlayState extends Phaser.State {
 		this.camera.shake(0.02, 200)
 
 		this.subLife(this.lifes)
+		this.trophy.show('first death')
 	}
 
 	subLife() {

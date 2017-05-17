@@ -155,6 +155,8 @@ final class RequesteHandle implements Runnable {
         switch(op){
         	case "add-trophy":
         		response = addTrophy(requestJson);
+        		System.out.println("ksoapkspoakspoakspoakp");
+        		System.out.println(response);
         		break;
         	case "list-trophy":
         		response = listTrophy();
@@ -169,6 +171,7 @@ final class RequesteHandle implements Runnable {
 		JSONParser parser = new JSONParser();
 		//Salva no objeto JSONObject o que o parse tratou do arquivo
 		jsonObject = (JSONObject) parser.parse(new FileReader("saida.json"));
+		System.out.println(jsonObject);
 		return jsonObject.toString();
 	}
 

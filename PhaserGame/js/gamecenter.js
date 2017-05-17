@@ -8,6 +8,11 @@ class Trophy extends Phaser.Sprite {
         title: 'Congratulations! You taked 10 coins',
         description: 'The first ten coins on game'}
 
+        this.data['first death'] = 
+        {name: 'first death', xp: 10, 
+        title: 'Unfortunatly this is your first death',
+        description: 'The first death on the game'}
+
         this.panels = [] // fila de paineis de trofeus
         this.achieved = [] // lista dos nomes do trofeus jah conquistados
 
@@ -54,7 +59,7 @@ class Trophy extends Phaser.Sprite {
         if (this.achieved.includes(trophyName))
             return
             
-        ServerComm.addTrophy(this.data['ten coins'], 
+        ServerComm.addTrophy(this.data[trophyName], 
             (response) => this.onServerResponse(response, trophyName) )
     }
 
@@ -82,6 +87,7 @@ class Trophy extends Phaser.Sprite {
         '<p>' + JSON.stringify(this.data['first death']) + '</p>'
 */
         // jQuery
+        console.log("Aparece")
         $('#div-trophy').append(
             '<p>' + JSON.stringify(this.data[trophyName]) + '</p>'
         )
@@ -124,6 +130,7 @@ class ServerComm {
         let url = 'http://localhost:8081/game/profile'
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
+                console.log(data)
                 let jsonObj = JSON.parse(data)
                 callback(jsonObj)
             })
