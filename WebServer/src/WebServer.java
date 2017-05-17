@@ -30,7 +30,7 @@ public final class WebServer {
     public static void main(String argv[]) throws Exception {
 
         int port = 8081; // Porta que o servidor ouvirá
-        String dirBase = "/"; // diretório onde estarão os arquivos
+        String dirBase = System.getProperty("user.home"); // diretório onde estarão os arquivos
 
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
