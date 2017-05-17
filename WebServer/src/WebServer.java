@@ -168,12 +168,14 @@ final class RequesteHandle implements Runnable {
         content.append("</title></head><body><h1>Index of "+ this.requestPath +"</h1>");
         content.append("<pre><a href=''>Name</a>                        <a href=''>Last modified</a>      <a href=''>Size</a><hr>");
         for(File f: file.listFiles()){
-            content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
-            Calendar lastModified = Calendar.getInstance();
-            lastModified.setTimeInMillis(f.lastModified());
-            content.append(new String(new char[100-f.getName().length()]).replace("\0",  " ") + "   ");
-            content.append("   ").append(f.length());
-            content.append("<br>");
+        	if(!f.isHidden()) {
+	            content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
+	            Calendar lastModified = Calendar.getInstance();
+	            lastModified.setTimeInMillis(f.lastModified());
+	            content.append(new String(new char[100-f.getName().length()]).replace("\0",  " ") + "   ");
+	            content.append("   ").append(f.length());
+	            content.append("<br>");
+        	}
          }
         content.append("<hr></pre>");
         content.append("ValentinServer/0.1.1b on ").append(requestHeader.get("Host:"));
