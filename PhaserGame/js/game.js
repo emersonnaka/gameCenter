@@ -24,8 +24,10 @@ class PlayState extends Phaser.State {
 		this.game.load.image('head', Config.ASSETS + 'character/Head.png')
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
 
-		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/Golds.png', 32, 32)
+		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/golds.png', 32, 32)
 		this.game.load.spritesheet('lifes', Config.ASSETS + 'objects/lifes.png', 32, 32)
+
+		this.game.load.image('trophy', Config.ASSETS + 'objects/trophy.png')
 	}
 
 	create() {
@@ -37,15 +39,34 @@ class PlayState extends Phaser.State {
 
         this.keys = this.game.input.keyboard.createCursorKeys()
         this.game.physics.arcade.gravity.y = 550
-
         this.score = 0
+
+        let fullScreenButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE)
+        fullScreenButton.onDown.add(this.toogleFullScreen, this)
+        let screenshotButton = this.game.input.keyboard.addKey(Phaser.Keyboard.P)
+        screenshotButton.onDown.add(this.takeScreenShot, this)
 
         this.createMap()
         this.createPlayer()
         this.createCollections()
         this.createHud()
 
-        let keys = this.game.input.keyboard.createCursorKeys()
+        this.trophy = new Trophy(this.game)
+        this.game.add.existing(this.trophy)
+	}
+
+	toogleFullScreen() {
+		this.game.scale.fillScreenScaleMode = Phaser.ScaleManager.EXACT_FIT
+		if(this.game.scale.isFullScreen)
+			this.game.scale.stopFullScreen()
+		else
+			this.game.scale.startFullScreen(false)
+	}
+
+	takeScreenShot() {
+		let imgData = this.game.canvas.toDataURL()
+        $('#div-screenshot').append(`<img src=${imgData} alt='game screenshot' class='screenshot'>`)
+        console.log('cade o print?')
 	}
 
 	createMap() {
@@ -108,6 +129,8 @@ class PlayState extends Phaser.State {
 	collectCoin(player, coin) {
 		coin.destroy()
 		this.addScore(coin.points)
+		if(this.score == 10)
+			this.trophy.show('ten coins')
 	}
 
 	addScore(amount) {
