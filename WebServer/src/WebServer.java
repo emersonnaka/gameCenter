@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -31,7 +30,7 @@ public final class WebServer {
     public static void main(String argv[]) throws Exception {
 
         int port = 8081; // Porta que o servidor ouvirá
-        String dirBase = "/home/nelsonjr/Documentos/gameCenter/PhaserGame"; // diretório onde estarão os arquivos
+        String dirBase = "/"; // diretório onde estarão os arquivos
 
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
@@ -169,10 +168,10 @@ final class RequesteHandle implements Runnable {
         content.append("</title></head><body><h1>Index of "+ this.requestPath +"</h1>");
         content.append("<pre><a href=''>Name</a>                        <a href=''>Last modified</a>      <a href=''>Size</a><hr>");
         for(File f: file.listFiles()){
-            content.append("<a href= '" + f.getName() + "'>" + f.getName() + "</a>");
+            content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
             Calendar lastModified = Calendar.getInstance();
             lastModified.setTimeInMillis(f.lastModified());
-            content.append(new String(new char[25-f.getName().length()]).replace("\0",  " ") + "   ").append(DateFormat.getInstance().format(lastModified.getTime()));
+            content.append(new String(new char[100-f.getName().length()]).replace("\0",  " ") + "   ");
             content.append("   ").append(f.length());
             content.append("<br>");
          }
