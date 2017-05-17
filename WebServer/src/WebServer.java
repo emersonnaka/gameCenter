@@ -178,7 +178,7 @@ final class RequesteHandle implements Runnable {
         	}
          }
         content.append("<hr></pre>");
-        content.append("ValentinServer/0.1.1b on ").append(requestHeader.get("Host:"));
+        content.append("Desenvolvimento Web/0.1.1b on ").append(requestHeader.get("Host:"));
         content.append("</body></html>");
 
         /* montando a resposta */
