@@ -121,7 +121,7 @@ class ServerComm {
     }
 
     static ajaxPost(data, callback) {
-        let url = 'http://localhost:8000'
+        let url = 'http://localhost:8081/game/profile'
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
                 let jsonObj = JSON.parse(data)

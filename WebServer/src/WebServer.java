@@ -2,7 +2,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +22,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -48,6 +57,7 @@ final class RequesteHandle implements Runnable {
     String dirBase;
     Socket socket;
     InputStream input;
+    BufferedReader inputReader;
     OutputStream output;
     private String requestPath;
     private HashMap<String, String> requestHeader;
@@ -56,6 +66,7 @@ final class RequesteHandle implements Runnable {
     public RequesteHandle(Socket socket, String diretorioBase) throws Exception {
         this.socket = socket;
         this.input = socket.getInputStream();
+        //this.inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.output = socket.getOutputStream();
   
         this.dirBase = diretorioBase;
@@ -81,6 +92,8 @@ final class RequesteHandle implements Runnable {
             /* tipo da requisicao */
             if (requestHeader.containsKey("GET")) {
                 response = responseGet(requestHeader);
+            } else if (requestHeader.containsKey("POST")){
+            	response = responsePost(requestHeader);
             } else {
                 response = response501_NotImplemented();
             }
@@ -96,16 +109,128 @@ final class RequesteHandle implements Runnable {
         
     }
 
-    private HashMap<String, String> buildRequestMap() throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(this.input));
+    private byte[] responsePost(HashMap<String, String> requestHeader) throws IOException, ParseException {
+    	String[] getParams = requestHeader.get("POST").split(" ");
+
+        if (getParams.length != 2) {
+            return response400_BadRequest();
+        }
+
+        this.requestPath = getParams[0];
+        
+        if (!this.requestPath.contains("/game/profile")) {
+            return response400_BadRequest();
+
+        } else {
+            return response_postJson(requestHeader);
+        }
+	}
+
+	private byte[] response_postJson(HashMap<String, String> requestHeader) throws IOException, ParseException {
+		System.out.println("-------- responde_postJson() --------");
+        String contentType = "application/json";
+        byte[] content = postJson(requestHeader);
+
+        String responseHeader = "HTTP/1.1 200 OK\n"
+                + "Content-Length: " + content.length + "\n"
+                + "Content-Type: " + contentType + "\n"
+                + "Set-Cookie: " + processCookieParams() + "\n"
+                + "\n";
+
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        result.write(responseHeader.getBytes());
+        result.write(content);
+        return result.toByteArray();
+	}
+
+	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException, ParseException {
+		String requestJson = requestHeader.get("Json");
+        String[] json = null;
+        String op = "";
+        String response = "";
+        
+        json = requestJson.replace("{", "").replace("}", "").replace("\"", "").split(",");
+        op = json[1].substring((json[1].indexOf(":") + 1), (json[1].length())).trim();
+        
+        switch(op){
+        	case "add-trophy":
+        		response = addTrophy(requestJson);
+        		break;
+        	case "list-trophy":
+        		response = listTrophy();
+        		break;
+        }
+        return response.getBytes();
+	}
+
+	private String listTrophy() throws FileNotFoundException, IOException, ParseException {
+		JSONObject jsonObject;
+		//Cria o parse de tratamento
+		JSONParser parser = new JSONParser();
+		//Salva no objeto JSONObject o que o parse tratou do arquivo
+		jsonObject = (JSONObject) parser.parse(new FileReader("saida.json"));
+		return jsonObject.toString();
+	}
+
+	private String addTrophy(String requestJson) {
+		System.out.println(requestJson);
+		JsonObject json = new JsonParser().parse(requestJson).getAsJsonObject();
+		JsonObject jsonData = json.getAsJsonObject("data");
+		
+		JSONObject jsonObject = new JSONObject();
+		FileWriter writeFile = null;
+		
+		System.out.println("Adicionando troféu");
+		String name = jsonData.get("name").getAsString();
+		String xp = jsonData.get("xp").getAsString();
+		String title = jsonData.get("title").getAsString();
+		String description = jsonData.get("description").getAsString();
+		
+		jsonObject.put("name", name);
+		jsonObject.put("xp", xp);
+		jsonObject.put("title", title);
+		jsonObject.put("description", description);
+		
+		try{
+			writeFile = new FileWriter("/home/nelsonjr/Documentos/gameCenter/WebServer/saida.json");
+			//Escreve no arquivo conteudo do Objeto JSON
+			writeFile.write(jsonObject.toJSONString());
+			writeFile.close();
+			System.out.println("Troféu adicionado!");
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		return returnAddTrophy();
+	}
+
+	private String returnAddTrophy(){
+		String resp = "{\"response\": \"ok\", \"data\": \"\"}";
+		return resp;
+	}
+	
+	private HashMap<String, String> buildRequestMap() throws IOException {
+        
+		inputReader = new BufferedReader(new InputStreamReader(this.input));
         /* monta o header em HashMap */
         HashMap<String, String> requestHeader = new HashMap<String, String>();
-        String requestLine = reader.readLine();
+        String requestLine = inputReader.readLine();
         while (requestLine != null && !requestLine.trim().isEmpty()) {
             String[] split = requestLine.split(" ", 2);
             requestHeader.put(split[0], split[1]);
             WebServer.log(split[0] + " " + split[1]);
-            requestLine = reader.readLine();
+            requestLine = inputReader.readLine();
+        }
+        
+        if (requestHeader.containsKey("POST")) {
+            String jsonbody = "";
+            int contentlenght = Integer.parseInt(requestHeader.get("Content-Length:"));
+            for (int i = 0; i < contentlenght; i++) {
+                jsonbody += (char) inputReader.read();
+            }
+            WebServer.log(jsonbody);
+            requestHeader.put("Json", jsonbody);
         }
         
         return requestHeader;
