@@ -30,7 +30,7 @@ public final class WebServer {
     public static void main(String argv[]) throws Exception {
 
         int port = 8081; // Porta que o servidor ouvirá
-        String dirBase = System.getProperty("user.home"); // diretório onde estarão os arquivos
+        String dirBase = "/"; // diretório onde estarão os arquivos
 
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
@@ -166,14 +166,14 @@ final class RequesteHandle implements Runnable {
         content.append("<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\"><html><head><title>");
         content.append("Listing content for directory " + this.requestPath);
         content.append("</title></head><body><h1>Index of "+ this.requestPath +"</h1>");
-        content.append("<pre><a href=''>Name</a>                        <a href=''>Last modified</a>      <a href=''>Size</a><hr>");
+        content.append("<pre><a href=''>Name</a>                                                 <a href=''>Last modified</a>      <a href=''>Size</a><hr>");
         for(File f: file.listFiles()){
         	if(!f.isHidden()) {
 	            content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
 	            Calendar lastModified = Calendar.getInstance();
 	            lastModified.setTimeInMillis(f.lastModified());
-	            content.append(new String(new char[100-f.getName().length()]).replace("\0",  " ") + "   ");
-	            content.append("   ").append(f.length());
+	            content.append(new String(new char[50 - f.getName().length()]).replace("\0",  " ") + "   ").append(DateFormat.getInstance().format(lastModified.getTime()));
+	            content.append("     ").append(f.length());
 	            content.append("<br>");
         	}
          }
