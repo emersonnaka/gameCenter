@@ -11,6 +11,7 @@ class Game extends Phaser.Game {
 
         this.state.add('Play', PlayState, false)
         this.state.add('Title', TitleState, false)
+        this.state.add('GameOver', GameOverState, false)
         this.state.start('Title')
     }
 }
@@ -108,11 +109,11 @@ class PlayState extends Phaser.State {
 		this.headImage = this.game.add.image(0, 0, 'head')
 		this.headImage.fixedToCamera = true
 
-		this.lifeText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' });
-        this.lifeText.text = 'Irineu: 3';
-        this.lifeText.fixedToCamera = true; 
+		this.lifeText = this.game.add.text(60, 10, '', { fontSize: "16px", fill: '#ff0000' })
+        this.lifeText.text = 'Irineu: ' + this.player.lifes
+        this.lifeText.fixedToCamera = true
 
-        this.scoreText = this.game.add.text(60, 30, '', { fontSize: "16px", fill: '#000000' });
+        this.scoreText = this.game.add.text(60, 30, '', { fontSize: "16px", fill: '#000000' })
         this.scoreText.text = 'Coins: 0'
         this.scoreText.fixedToCamera = true
 	}
@@ -156,6 +157,11 @@ class PlayState extends Phaser.State {
 
 		this.subLife(this.lifes)
 		this.trophy.show('first death')
+
+		if(this.player.lifes < 0) {
+			this.game.camera.onFadeComplete.removeAll(this)
+        	this.game.state.start('GameOver')
+        }
 	}
 
 	subLife() {

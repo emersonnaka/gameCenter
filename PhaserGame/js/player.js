@@ -6,7 +6,7 @@ class Player extends Phaser.Sprite {
         this.body.collideWorldBounds = true
         this.body.setSize(38, 45, 5, 11)
         this.anchor.setTo(0.5, 0.5)
-        this.lifes = 3
+        this.lifes = 0
 
         this.animations.add('idle', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, true)
         this.animations.add('run', [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 20, true)
