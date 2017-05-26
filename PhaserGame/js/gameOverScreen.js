@@ -9,13 +9,13 @@ class GameOverState extends Phaser.State {
         this.imgGameOver = this.game.add.image(0, 0, 'gameOverScreen')
         this.imgGameOver.anchor.setTo(0.5, 0.5)
         this.imgGameOver.x = this.game.width/2
-        this.imgGameOver.y = 50
+        this.imgGameOver.y = 75
 
         this.bg = this.game.add.image(0, 0, 'headDead')
         this.bg.scale.setTo(0.5, 0.5)
         this.bg.anchor.setTo(0.5, 0.5)
         this.bg.x = this.game.width/2
-        this.bg.y = 250
+        this.bg.y = 260
 
         this.pressStart = this.game.add.text(0, 0, 'Press ENTER to restart', {fontSize: '16px', fill: '#ffffff'})
         this.pressStart.anchor.setTo(0.5, 0.5)
