@@ -12,9 +12,13 @@ class Player extends Phaser.Sprite {
         this.animations.add('run', [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 20, true)
         this.animations.add('jump', [20], 10, true)
 
+
         let jumpButton = this.game.input.keyboard.addKey(
             Phaser.Keyboard.SPACEBAR)
         jumpButton.onDown.add(this.jump, this)
+
+        let attackButton = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL)
+        // attackButton.onDown.add(this.attack, this)
     }
 
     update() {
