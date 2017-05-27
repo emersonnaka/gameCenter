@@ -26,9 +26,9 @@ class GameOverState extends Phaser.State {
             Phaser.Keyboard.ONE)
         fullScreenButton.onDown.add(this.toogleFullScreen, this)
 
-        let startButton = this.game.input.keyboard.addKey(
+        let restartButton = this.game.input.keyboard.addKey(
             Phaser.Keyboard.ENTER)
-        startButton.onDown.add(this.startFade, this)
+        restartButton.onDown.add(this.startFade, this)
 
         // fade no título
         this.imgGameOver.alpha = 0.3

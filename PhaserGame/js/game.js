@@ -12,6 +12,7 @@ class Game extends Phaser.Game {
         this.state.add('Play', PlayState, false)
         this.state.add('Title', TitleState, false)
         this.state.add('GameOver', GameOverState, false)
+        this.state.add('Win', WinState, false)
         this.state.start('Title')
     }
 }
@@ -23,7 +24,7 @@ class PlayState extends Phaser.State {
 		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
 		this.game.load.image('background', Config.ASSETS + 'background.png')
 
-		this.game.load.image('head', Config.ASSETS + 'character/Head.png')
+		this.game.load.image('head', Config.ASSETS + 'character/HeadHUD.png')
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
 
 		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/golds.png', 32, 32)
@@ -126,6 +127,8 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.collide(this.player, this.trapsLayer, this.playerDied, null, this)
 
         this.game.physics.arcade.overlap(this.player, this.life, this.collectLife, null, this)
+
+        this.nextPhase()
 	}
 
 	collectCoin(player, coin) {
@@ -167,6 +170,13 @@ class PlayState extends Phaser.State {
 	subLife() {
 		this.player.subLife()
 		this.lifeText.text = 'Irineu: ' + this.player.lifes
+	}
+
+	nextPhase() {
+		if(this.player.x >= 3940) {
+			this.game.camera.onFadeComplete.removeAll(this)
+        	this.game.state.start('Win')
+		}
 	}
 
 	render() {
