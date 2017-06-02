@@ -2,9 +2,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,13 +21,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     public static void log(String message){
@@ -43,7 +34,7 @@ public final class WebServer {
 
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
-
+        
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket
             new Thread(new RequesteHandle(socket, dirBase)).run();
@@ -109,7 +100,7 @@ final class RequesteHandle implements Runnable {
         
     }
 
-    private byte[] responsePost(HashMap<String, String> requestHeader) throws IOException, ParseException {
+    private byte[] responsePost(HashMap<String, String> requestHeader) throws IOException{
     	String[] getParams = requestHeader.get("POST").split(" ");
 
         if (getParams.length != 2) {
@@ -126,7 +117,7 @@ final class RequesteHandle implements Runnable {
         }
 	}
 
-	private byte[] response_postJson(HashMap<String, String> requestHeader) throws IOException, ParseException {
+	private byte[] response_postJson(HashMap<String, String> requestHeader) throws IOException{
 		System.out.println("-------- responde_postJson() --------");
         String contentType = "application/json";
         byte[] content = postJson(requestHeader);
@@ -143,8 +134,11 @@ final class RequesteHandle implements Runnable {
         return result.toByteArray();
 	}
 
-	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException, ParseException {
+	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException{
 		String requestJson = requestHeader.get("Json");
+		System.out.println("Printando a requisição");
+		System.out.println(requestJson);
+		System.exit(1);
         String[] json = null;
         String op = "";
         String response = "";
@@ -165,45 +159,13 @@ final class RequesteHandle implements Runnable {
         return response.getBytes();
 	}
 
-	private String listTrophy() throws FileNotFoundException, IOException, ParseException {
-		JSONObject jsonObject;
-		//Cria o parse de tratamento
-		JSONParser parser = new JSONParser();
-		//Salva no objeto JSONObject o que o parse tratou do arquivo
-		jsonObject = (JSONObject) parser.parse(new FileReader("saida.json"));
-		System.out.println(jsonObject);
-		return jsonObject.toString();
+	private String listTrophy(){
+		return "";
 	}
 
 	private String addTrophy(String requestJson) {
-		System.out.println(requestJson);
-		JsonObject json = new JsonParser().parse(requestJson).getAsJsonObject();
-		JsonObject jsonData = json.getAsJsonObject("data");
-		
-		JSONObject jsonObject = new JSONObject();
-		FileWriter writeFile = null;
-		
+
 		System.out.println("Adicionando troféu");
-		String name = jsonData.get("name").getAsString();
-		String xp = jsonData.get("xp").getAsString();
-		String title = jsonData.get("title").getAsString();
-		String description = jsonData.get("description").getAsString();
-		
-		jsonObject.put("name", name);
-		jsonObject.put("xp", xp);
-		jsonObject.put("title", title);
-		jsonObject.put("description", description);
-		
-		try{
-			writeFile = new FileWriter("/home/nelsonjr/Documentos/gameCenter/WebServer/saida.json");
-			//Escreve no arquivo conteudo do Objeto JSON
-			writeFile.write(jsonObject.toJSONString());
-			writeFile.close();
-			System.out.println("Troféu adicionado!");
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
 		
 		return returnAddTrophy();
 	}
@@ -379,7 +341,7 @@ final class RequesteHandle implements Runnable {
         return responseHeader.getBytes();
     }
 
-    private byte[] response401_NotAuthorized() throws IOException {
+    /*private byte[] response401_NotAuthorized() throws IOException {
         String responseHeader = "HTTP/1.1 401 Not Authorized\n"
                 + "WWW-Authenticate: Basic realm=\"Entre com usuário e senha\"\n"
                 + "\n"
@@ -392,7 +354,7 @@ final class RequesteHandle implements Runnable {
                 + "</address></body></html>";
 
         return responseHeader.getBytes();
-    }
+    }*/
 
     private byte[] response501_NotImplemented() throws IOException {
         String responseHeader = "HTTP/1.1 501 Not implemented\n"
