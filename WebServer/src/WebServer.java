@@ -14,12 +14,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -135,44 +140,39 @@ final class RequesteHandle implements Runnable {
 	}
 
 	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException{
+		DAO dao = new DAO();
 		String requestJson = requestHeader.get("Json");
-		System.out.println("Printando a requisição");
 		System.out.println(requestJson);
-		System.exit(1);
+		JsonObject jobj = new Gson().fromJson(requestJson, JsonObject.class);
         String[] json = null;
         String op = "";
         String response = "";
+        
         
         json = requestJson.replace("{", "").replace("}", "").replace("\"", "").split(",");
         op = json[1].substring((json[1].indexOf(":") + 1), (json[1].length())).trim();
         
         switch(op){
         	case "add-trophy":
-        		response = addTrophy(requestJson);
-        		System.out.println("ksoapkspoakspoakspoakp");
-        		System.out.println(response);
+        		JsonObject jsonData = jobj.getAsJsonObject("data");
+        		String name = jsonData.get("name").getAsString();
+        		int xp = jsonData.get("xp").getAsInt();
+        		String title = jsonData.get("title").getAsString();
+        		String description = jsonData.get("description").getAsString();
+        		System.out.println(name + xp + title + description);
+        		response = dao.addTrophy(name, xp, title, description);
         		break;
         	case "list-trophy":
-        		response = listTrophy();
+        		response = dao.listTrophy();
         		break;
+        	case "get-trophy":
+        		JsonObject jsonData1 = jobj.getAsJsonObject("data");
+        		String name1 = jsonData1.get("name").getAsString();
+        		response = dao.getTrophy(name1);
+        	case "clear-trophy":
+        		response = dao.clearTrophy();
         }
         return response.getBytes();
-	}
-
-	private String listTrophy(){
-		return "";
-	}
-
-	private String addTrophy(String requestJson) {
-
-		System.out.println("Adicionando troféu");
-		
-		return returnAddTrophy();
-	}
-
-	private String returnAddTrophy(){
-		String resp = "{\"response\": \"ok\", \"data\": \"\"}";
-		return resp;
 	}
 	
 	private HashMap<String, String> buildRequestMap() throws IOException {

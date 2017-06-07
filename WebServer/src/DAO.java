@@ -2,10 +2,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-//import java.sql.Statement;
+import java.sql.Statement;
+import java.util.ArrayList;
 //import java.util.ArrayList;
-//import java.util.List;
+import java.util.List;
 
 public class DAO {
 
@@ -14,7 +14,7 @@ public class DAO {
     private static final String driver = "com.mysql.jdbc.Driver";
     private static final String userName = "root";
     private static final String password = "root";
-
+    
     /*public static boolean addPlayer(int id, String nome, String email) {
         Connection conexao = null;
         PreparedStatement pst = null;
@@ -36,26 +36,95 @@ public class DAO {
         }
     }*/
     
-    /*public static boolean addTrophy(String name, int xp, String title, String description) {
+    public String addTrophy(String name, int xp, String title, String description) {
         Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
+    	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
+    	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
+    	
         try {
-            Class.forName(driver).newInstance();
+        	System.out.println("Inserindo o troféu");
+        	Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
             Statement statement = conexao.createStatement();
-            String sql = "INSERT INTO trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
-
+            String sql = "INSERT INTO Trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
             statement.execute(sql);
             statement.close();
-            return true;
+            System.out.println("Troféu inserido com sucesso!");
+            return respOk;
 
         } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
-            return false;
+            System.out.println("Troféu não inserido");
+            return respErr;
         }
-    }*/
+    }
+    
+    public String getTrophy(String name){
+    	
+    	return "OK";    	
+    }
+    
+    public String clearTrophy(){
+    	String resp = null;
+    	Connection conexao = null;
+    	
+        try {
+        	System.out.println("Limpando troféus salvos");
+        	Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            Statement statement = conexao.createStatement();
+            String sql = "TRUNCATE TABLE Trophy";
+            statement.execute(sql);
+            statement.close();
+            System.out.println("Troféus excluídos com sucesso!");
+            resp = "{\"response\":\"ok\",\"data\":\"\"}";
+            return resp;
+
+        } catch (Exception ex) {
+            System.out.println("Erro : " + ex.getMessage());
+            System.out.println("Troféu não inserido");
+            return resp;
+        }
+    }
+    
+    public String listTrophy() {
+    	
+    	Connection conexao = null;
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	List<String> respAux = new ArrayList<String>();    
+    	String resp = "";
+    	
+    	
+    	try {
+    		System.out.println("Listando Troféus");
+        	Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            pst = conexao.prepareStatement("SELECT * FROM Trophy");
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux = "{\"name\":\"" + rs.getString("name")+"\"";
+                aux += ",\"xp\":\"" + String.valueOf(rs.getInt("xp"))+"\"";
+                aux += ",\"title\":\"" + rs.getString("title")+"\"";
+                aux += ",\"description\":\"" + rs.getString("description") +"\"" + "}";
+                respAux.add(aux);
+            }
+            resp = "[";
+            for (int i = 0; i < respAux.size(); i++) {
+				if(i+1 == respAux.size())
+					resp += respAux.get(i)+"]";
+				else
+					resp += respAux.get(i) + ", ";
+			}
+
+			return resp;
+
+        } catch (Exception ex) {
+            System.out.println("Erro : " + ex.getMessage());
+			return resp ;
+        }
+	}
 
     /*public static boolean verificaPlayer(int id) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         Connection conexao = null;
@@ -74,7 +143,7 @@ public class DAO {
         }
     }*/
 
-    public static String getPlayer() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
+    /*public static String getPlayer() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
         Connection conexao = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
@@ -91,7 +160,7 @@ public class DAO {
             aux += ", email:" + rs.getString("email") + "}";
         }
         return aux;
-    }
+    }*/
 
     /*public static boolean atualizarUsuario(int id, String nome, String email) {
         Connection conexao = null;

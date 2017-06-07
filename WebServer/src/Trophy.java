@@ -54,7 +54,4 @@ public class Trophy {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
-	
 }
