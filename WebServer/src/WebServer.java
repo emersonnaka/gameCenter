@@ -41,16 +41,17 @@ public final class WebServer {
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
         
-        String targetURL = "http://192.168.43.133:8081";
+        //Descomentar para fazer a comunicação entre pcs na rede
+        /*String targetURL = "http://192.168.43.133:8081";
         String urlParameters = "{\"id\":\"1\",\"op\":\"list-trophy\", \"data\":\"\"}";
-        executePost(targetURL, urlParameters);
+        executePost(targetURL, urlParameters);*/
         
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket
             new Thread(new RequesteHandle(socket, dirBase)).run();
         }
     }
-    
+    /*
     public static String executePost(String targetURL, String urlParameters) {
     	  HttpURLConnection connection = null;
 
@@ -93,7 +94,7 @@ public final class WebServer {
     	      connection.disconnect();
     	    }
     	  }
-    	}
+    	}*/
 }
 
 final class RequesteHandle implements Runnable {
