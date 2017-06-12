@@ -131,7 +131,7 @@ class ServerComm {
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
                 console.log(data)
-                let jsonObj = JSON.parse(data)
+                let jsonObj = JSON.parse(JSON.stringify(data))
                 callback(jsonObj)
             })
             .fail(function(jqXHR, status, errorThrown) {
