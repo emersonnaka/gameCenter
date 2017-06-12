@@ -10,46 +10,48 @@ class Player extends Phaser.Sprite {
         this.isAttack = false;
 
         this.animations.add('idle', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, true)
-        this.animations.add('run', [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 20, true)
+        this.animations.add('run', [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 50, true)
         this.animations.add('jump', [20], 10, true)
-        this.animations.add('attack', [21, 22, 23, 24, 25, 26, 27, 28, 29, 30], 30, true)
+        this.animations.add('walk', [21, 22, 23, 24, 25, 26, 27, 28, 29, 30], 30, true)
 
 
         let jumpButton = this.game.input.keyboard.addKey(
             Phaser.Keyboard.SPACEBAR)
         jumpButton.onDown.add(this.jump, this)
 
-        let attackButton = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL)
-        attackButton.onDown.add(this.attack, this)
+        this.runButton = this.game.input.keyboard.addKey(Phaser.Keyboard.CONTROL)
     }
 
     update() {
         this.body.velocity.x = 0
 
-        if (this.keys.left.isDown)
-            this.body.velocity.x = -150
-        else if (this.keys.right.isDown)
-            this.body.velocity.x = 150
+        if (this.keys.left.isDown) {
+            this.body.velocity.x = -100
+            if (this.runButton.isDown)
+                this.body.velocity.x = -300
+        }
+        else if (this.keys.right.isDown) {
+            this.body.velocity.x = 100
+            if (this.runButton.isDown)
+                this.body.velocity.x = 300
+        }
 
         this.animate()
     }
 
     animate() {
     	// Andando ou parado
-    	if (this.body.velocity.x != 0)
-            this.animations.play('run')
-        else
+    	if (this.body.velocity.x != 0) {
+            if (this.body.velocity.x == 100 || this.body.velocity.x == -100)
+                this.animations.play('walk')
+            else
+                this.animations.play('run')
+        } else
             this.animations.play('idle')
 
         // No ar
         if (this.body.velocity.y != 0)
             this.animations.play('jump')
-        else {
-            if(this.isAttack) {
-                this.animations.play('attack')
-                this.isAttack = false;
-            }
-        }
 
         // Define o lado
         if (this.body.velocity.x > 0)
@@ -60,12 +62,11 @@ class Player extends Phaser.Sprite {
 
     jump() {
         if (this.body.onFloor()) {
-            this.body.velocity.y = -350
+            if (this.body.velocity.x != 300 && this.body.velocity.x != -300)
+                this.body.velocity.y = -350
+            else
+                this.body.velocity.y = -300
         }
-    }
-
-    attack() {
-        this.isAttack = true;
     }
 
     subLife() {
