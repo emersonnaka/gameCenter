@@ -59,9 +59,35 @@ public class DAO {
         }
     }
     
-    public String getTrophy(String name){
+    public String getTrophy(String data){
     	
-    	return "OK";    	
+    	Connection conexao = null;
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	String respOk = "";
+    	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
+    	
+    	try {
+    		System.out.println("Procurando por troféu");
+    		Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            pst = conexao.prepareStatement("SELECT * FROM Trophy WHERE name = ?");
+            pst.setString(1, data);
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux = "{\"name\":\"" + rs.getString("name")+"\"";
+                aux += ",\"xp\":\"" + String.valueOf(rs.getInt("xp"))+"\"";
+                aux += ",\"title\":\"" + rs.getString("title")+"\"";
+                aux += ",\"description\":\"" + rs.getString("description") +"\"" + "}";
+            }
+            respOk = "\"response\":\"ok\", \"data\": \"" + aux + "\"";
+            return respOk;
+    		
+    	} catch (Exception ex) {
+    		System.out.println("Troféu não encontrado");
+    		return respErr;
+    	}
     }
     
     public String clearTrophy(){
@@ -110,14 +136,17 @@ public class DAO {
                 aux += ",\"description\":\"" + rs.getString("description") +"\"" + "}";
                 respAux.add(aux);
             }
-            resp = "[";
-            for (int i = 0; i < respAux.size(); i++) {
-				if(i+1 == respAux.size())
-					resp += respAux.get(i)+"]";
-				else
-					resp += respAux.get(i) + ", ";
-			}
-
+            if(respAux.isEmpty()){
+            	resp = "[]";
+            } else {
+	            resp = "[";
+	            for (int i = 0; i < respAux.size(); i++) {
+					if(i+1 == respAux.size())
+						resp += respAux.get(i)+"]";
+					else
+						resp += respAux.get(i) + ", ";
+				}
+            }
 			return resp;
 
         } catch (Exception ex) {

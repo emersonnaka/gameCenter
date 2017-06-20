@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -191,21 +192,22 @@ final class RequesteHandle implements Runnable {
 
 	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException{
 		DAO dao = new DAO();
+		
 		String requestJson = requestHeader.get("Json");
-		System.out.println(requestJson);
-		JsonObject jobj = new Gson().fromJson(requestJson, JsonObject.class);
-        String[] json = null;
+		JsonParser parser = new JsonParser();
+        JsonObject obj = parser.parse(requestJson).getAsJsonObject();
+        JsonObject jsonData;
+        
         String op = "";
         String response = "";
+		String name;
         
-        
-        json = requestJson.replace("{", "").replace("}", "").replace("\"", "").split(",");
-        op = json[1].substring((json[1].indexOf(":") + 1), (json[1].length())).trim();
-        
+        op = obj.get("op").getAsString();
+
         switch(op){
         	case "add-trophy":
-        		JsonObject jsonData = jobj.getAsJsonObject("data");
-        		String name = jsonData.get("name").getAsString();
+        		jsonData = obj.getAsJsonObject("data");
+        		name = jsonData.get("name").getAsString();
         		int xp = jsonData.get("xp").getAsInt();
         		String title = jsonData.get("title").getAsString();
         		String description = jsonData.get("description").getAsString();
@@ -216,9 +218,9 @@ final class RequesteHandle implements Runnable {
         		response = dao.listTrophy();
         		break;
         	case "get-trophy":
-        		JsonObject jsonData1 = jobj.getAsJsonObject("data");
-        		String name1 = jsonData1.get("name").getAsString();
-        		response = dao.getTrophy(name1);
+        		name = obj.get("data").getAsString();
+        		response = dao.getTrophy(name);
+        		break;
         	case "clear-trophy":
         		response = dao.clearTrophy();
         }
