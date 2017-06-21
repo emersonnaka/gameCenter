@@ -25,7 +25,10 @@ class Trophy extends Phaser.Sprite {
 
     updateAchievedTrophies(json) {
         // coloca os nomes dos trofeus na lista de controle: this.achieved
-        let list = json['data']
+        console.log(json)
+        let list = JSON.parse(JSON.stringify(json))
+        
+        console.log(list)
         for (let t of list) {
             this.achieved.push(t['name'])
             this.addTrophyOnPage(t['name'])
@@ -87,7 +90,6 @@ class Trophy extends Phaser.Sprite {
         '<p>' + JSON.stringify(this.data['first death']) + '</p>'
 */
         // jQuery
-        console.log("Aparece")
         $('#div-trophy').append(
             '<p>' + JSON.stringify(this.data[trophyName]) + '</p>'
         )
