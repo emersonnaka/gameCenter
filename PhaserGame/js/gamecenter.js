@@ -25,10 +25,7 @@ class Trophy extends Phaser.Sprite {
 
     updateAchievedTrophies(json) {
         // coloca os nomes dos trofeus na lista de controle: this.achieved
-        console.log(json)
         let list = JSON.parse(JSON.stringify(json))
-        
-        console.log(list)
         for (let t of list) {
             this.achieved.push(t['name'])
             this.addTrophyOnPage(t['name'])
@@ -36,9 +33,8 @@ class Trophy extends Phaser.Sprite {
     }
 
     createPanel(trophyName) {
-       let panelY = this.game.height - 74 - this.panels.length * 74
-       let panel = this.game.add.sprite(this.game.width - 250,
-                        panelY, 'trophy')
+        let panelY = this.game.height - 74 - this.panels.length * 74
+        let panel = this.game.add.sprite(this.game.width - 250, panelY, 'trophy')
         panel.fixedToCamera = true 
         //panel.alpha = 0
 

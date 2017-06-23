@@ -32,7 +32,7 @@ div.outer {
 }
 
 .parallax {
-    background-image: url('assets/page_background.jpg'); /* The image used */
+    background-image: url('assets/page_background.png'); /* The image used */
     height: 100%;  /* Full height */
     width: 100%;
     position: fixed;
