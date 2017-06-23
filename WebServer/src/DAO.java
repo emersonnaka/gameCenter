@@ -100,7 +100,7 @@ public class DAO {
     		System.out.println("Procurando por troféu");
     		Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            pst = connectionDatabase.prepareStatement("SELECT * FROM Trophy WHERE name = ?");
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE name = ?");
             pst.setString(1, data);
             rs = pst.executeQuery();
             String aux = "";
@@ -127,7 +127,7 @@ public class DAO {
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
             Statement statement = connectionDatabase.createStatement();
-            String sql = "TRUNCATE TABLE Trophy";
+            String sql = "TRUNCATE TABLE " + trophyTable;
             statement.execute(sql);
             statement.close();
             System.out.println("Troféus excluídos com sucesso!");
@@ -152,7 +152,7 @@ public class DAO {
     		System.out.println("Listando Troféus");
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            pst = connectionDatabase.prepareStatement("SELECT * FROM Trophy");
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
