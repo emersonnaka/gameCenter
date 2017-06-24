@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 //import java.util.ArrayList;
@@ -9,11 +10,14 @@ import java.util.List;
 
 public class DAO {
 
-    private static final String url = "jdbc:mysql://localhost:3306/";
-    private static final String dbName = "web";
-    private static final String driver = "com.mysql.jdbc.Driver";
-    private static final String userName = "root";
-    private static final String password = "root";
+	private Connection connectionDatabase;
+	private PreparedStatement stmt;
+    private final String url = "jdbc:mysql://localhost:3306/";
+    private final String driver = "com.mysql.jdbc.Driver";
+    private final String userName = "root";
+    private final String password = "root";
+    private final String dbName = "web";
+    private final String trophyTable = "Trophy";
     
     /*public static boolean addPlayer(int id, String nome, String email) {
         Connection conexao = null;
@@ -36,16 +40,43 @@ public class DAO {
         }
     }*/
     
+    public DAO() {
+    	String createDatabase = new String("CREATE DATABASE IF NOT EXISTS " + dbName);
+    	StringBuilder createTrophyTable = new StringBuilder();
+    	createTrophyTable.append("CREATE TABLE IF NOT EXISTS " + trophyTable + "(");
+    	createTrophyTable.append("`id` int(11) NOT NULL AUTO_INCREMENT, ");
+    	createTrophyTable.append("`name` varchar(255) DEFAULT NULL, ");
+    	createTrophyTable.append("`xp` int(11) DEFAULT NULL, ");
+    	createTrophyTable.append("`title` varchar(255) DEFAULT NULL, ");
+    	createTrophyTable.append("`description` varchar(255) DEFAULT NULL, ");
+    	createTrophyTable.append("PRIMARY KEY (`id`))");
+    	
+    	try {
+			connectionDatabase = DriverManager.getConnection(url, userName, password);
+			stmt = connectionDatabase.prepareStatement(createDatabase);
+			stmt.execute();
+			
+			connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+			stmt = connectionDatabase.prepareStatement(createTrophyTable.toString());
+			stmt.execute();
+			
+			System.out.println("Database created successfully");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    }
+    
     public String addTrophy(String name, int xp, String title, String description) {
-        Connection conexao = null;
     	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
     	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
     	
         try {
         	System.out.println("Inserindo o troféu");
         	Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = conexao.createStatement();
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            Statement statement = connectionDatabase.createStatement();
             String sql = "INSERT INTO Trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
             statement.execute(sql);
             statement.close();
@@ -60,8 +91,6 @@ public class DAO {
     }
     
     public String getTrophy(String data){
-    	
-    	Connection conexao = null;
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	String respOk = "";
@@ -70,8 +99,8 @@ public class DAO {
     	try {
     		System.out.println("Procurando por troféu");
     		Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            pst = conexao.prepareStatement("SELECT * FROM Trophy WHERE name = ?");
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE name = ?");
             pst.setString(1, data);
             rs = pst.executeQuery();
             String aux = "";
@@ -92,14 +121,13 @@ public class DAO {
     
     public String clearTrophy(){
     	String resp = null;
-    	Connection conexao = null;
     	
         try {
         	System.out.println("Limpando troféus salvos");
         	Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = conexao.createStatement();
-            String sql = "TRUNCATE TABLE Trophy";
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            Statement statement = connectionDatabase.createStatement();
+            String sql = "TRUNCATE TABLE " + trophyTable;
             statement.execute(sql);
             statement.close();
             System.out.println("Troféus excluídos com sucesso!");
@@ -114,8 +142,6 @@ public class DAO {
     }
     
     public String listTrophy() {
-    	
-    	Connection conexao = null;
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	List<String> respAux = new ArrayList<String>();    
@@ -125,8 +151,8 @@ public class DAO {
     	try {
     		System.out.println("Listando Troféus");
         	Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            pst = conexao.prepareStatement("SELECT * FROM Trophy");
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {

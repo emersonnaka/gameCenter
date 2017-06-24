@@ -1,0 +1,55 @@
+
+body { 
+    padding-top: 50px; 
+    background-color: #555555
+}
+
+.screenshot {
+    margin: 10px;
+    width: 30%;
+    font-size: .8em;
+    /*border: 1px solid white;*/
+    width: fit-content;
+    display: inline-block;
+}
+
+.screenshot img {
+    width: 100%;
+}
+
+.screenshot p {
+    float: right;
+    height: 0px;
+}
+
+div.center {
+    display: table;
+    margin: 10px auto;
+    /*cursor: none;*/ /*esconde mouse*/
+}
+div.outer {
+    width: 100%;
+}
+
+.parallax {
+    background-image: url('assets/page_background.png'); /* The image used */
+    height: 100%;  /* Full height */
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+    /* Create the blur effect */            
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);     
+}   

@@ -4,47 +4,164 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Simple Platformer With Physics</title>
-
-    <script src="js/lib/phaser.js"></script>
-    <script src='js/lib/jquery-3.2.0.js'></script>
-    <script src="js/titleScreen.js"></script>
-    <script src="js/gameOverScreen.js"></script>
-    <script src="js/winScreen.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/items.js"></script>
-    <script src="js/gamecenter.js"></script>
-
-    <style>
-        body {
-            margin: 0px;
-            padding: 0px;
-            font-family: Arial;
-            font-size: 14px;
-            background-color: #131313;
-            color: #fff;
-        }
-
-        div.center {
-            display: table;
-            margin: 10px auto;
-        }
-
-        img.screenshot {
-            height: 200px;
-            margin: 10px;
-        }
-    </style>
+    <title>Irineu's Adventure</title>
 </head>
 
 <body>
-    <div class="outer" style="width:100%">
-        <div id="game-container" class='center'></div>
+<div class='parallax'></div>
+
+<!-- FIXED NAVBAR -->
+<nav class='navbar navbar-inverse navbar-fixed-top'>
+  <div class='container'>
+    <div class='navbar-header'>
+      <div class='navbar-brand'>
+        Game Center
+      </div>
     </div>
-    <div id='div-trophy'></div>
-    <div id='div-screenshot'></div>
+    
+    <!-- form de login -->
+    <form class='navbar-form navbar-left' id='form-login'>
+      <div class='form-group'>
+        <input type='text' class='form-control' placeholder='Username'>
+        <input type='password' class='form-control' placeholder='Password'>
+      </div>
+      <button type='button' class='btn btn-primary'
+              id='form-login-button'>
+          <span class='glyphicon glyphicon-log-in'></span>
+          Login
+      </button>
+    </form>
+
+    <!-- informacao apos o login -->
+    <div class='nav navbar-nav' id='label-logged-in' 
+         style='display: none'>
+      <p class='navbar-text'>
+        Logged in as <strong>John Doe</strong>
+      </p>
+      <form class='navbar-form navbar-left'>
+        <button type='button' class='btn btn-primary'
+                id='button-profile' data-toggle='modal'
+                data-target='#modalProfile'>
+          <span class='glyphicon glyphicon-modal-window'></span>
+          View Profile                
+        </button>
+      </form>
+    </div>
+
+    <!-- status da conexao com game server -->
+    <div class='nav navbar-nav navbar-right'>
+      <p class='navbar-text'>Status:</p>
+      <h4 class='navbar-text'>
+        <span class='label label-success'>ONLINE</span>
+      </h4>
+    </div>
+
+  </div>
+</nav>
+
+<!-- MODAL: PROFILE -->
+<div id='modalProfile' class='modal fade' role='dialog'>
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+
+      <div class='modal-header'>
+        <button type='button' class='close' data-dismiss='modal'>
+          &times;
+        </button>
+        <h4 class='modal-title'>John Doe Profile</h4>
+      </div>
+
+      <!-- lista de itens do profile -->
+      <ul class='modal-body list-group'>
+        <li class='list-group-item justify-content-between'>
+          Gamer Points (XP)
+          <span class='badge badge-default badge-pill'>220</span>
+        </li>
+        <li class='list-group-item justify-content-between'>
+          Gamer Points (XP)
+          <span class='badge badge-default badge-pill'>220</span>
+        </li>
+      </ul>
+
+      <div class='modal-footer'>
+        <button type='button' class='btn btn-default' 
+                data-dismiss='modal'>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY --> 
+
+<div class="container">
+    <!-- Phaser Game -->
+    <div id="game-container" class="center">
+    </div>
+
+    <!-- Panel Trophies -->
+    <div class='panel panel-default'>
+      <div class='panel-heading'>
+        <h3 class='panel-title'>Trophies</h3>
+        <small>List of unlocked trophies</small>
+      </div>
+      <div class='panel-body'>
+        <ul id='div-trophy' class="list-group">
+          <p id='trophies-list-empty-label'>
+            There are no trophies.
+          </p>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Panel Screenshots -->
+    <div class='panel panel-default'>
+      <div class='panel-heading'>
+        <h3 class='panel-title'>Screenshots</h3>
+        <small>Use <kbd>P</kbd> to capture the game screen</small>
+      </div>
+      <div class='panel-body'>
+        <div id='div-screenshot'>
+          <p id='screenshots-empty-label'>
+            There are no screenshots.
+          </p>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- TEMPLATES -->
+<script id='template-profile-item'
+        type='type/x-handlebars-template'>
+  <li class='list-group-item justify-content-between'>
+    {{description}}
+    <span class='badge badge-default badge-pill'>{{value}}</span>
+  </li>
+</script>
+
+<script id='template-trophies-list-item'
+        type='type/x-handlebars-template'>
+  <li class='list-group-item list-group-item-action flex-column align-items-start'>
+    <h5 class='mb-1'>
+      <strong>{{title}}</strong>
+      <small>{{xp}}xp</small>
+    </h5>
+    <p class='mb-1'>{{description}}</p>
+    <small><kbd>{{name}}</kbd></small>
+  </li>
+</script>
 </body>
+
+<link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.css">
+<link rel="stylesheet" href="styles.css">
+<script src="js/lib/phaser.js"></script>
+<script src='js/lib/jquery-3.2.0.js'></script>
+
+<script src="js/titleScreen.js"></script>
+<script src="js/gameOverScreen.js"></script>
+<script src="js/winScreen.js"></script>
+<script src="js/game.js"></script>
+<script src="js/player.js"></script>
+<script src="js/items.js"></script>
+<script src="js/gamecenter.js"></script>
 
 </html>
