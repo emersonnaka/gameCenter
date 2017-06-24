@@ -223,6 +223,15 @@ final class RequesteHandle implements Runnable {
         		break;
         	case "clear-trophy":
         		response = dao.clearTrophy();
+        		break;
+        	case "save-state":
+        		jsonData = obj.getAsJsonObject("data");
+        		int x = jsonData.get("x").getAsInt();
+        		int y = jsonData.get("y").getAsInt();
+        		response = dao.saveState(x, y);
+        		break;
+        	case "load-state":
+        		response = dao.loadState();
         }
         return response.getBytes();
 	}

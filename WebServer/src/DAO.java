@@ -155,6 +155,60 @@ public class DAO {
         }
 	}
 
+    public String saveState(int x, int y){
+    	Connection conexao = null;
+    	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
+    	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
+    	
+        try {
+        	Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            Statement statement = conexao.createStatement();
+            String sql = "INSERT INTO State(x, y) VALUES ("+ x + ", " + y + ")";
+            statement.execute(sql);
+            statement.close();
+            System.out.println("Estado salvo!");
+            return respOk;
+
+        } catch (Exception ex) {
+            System.out.println("Erro : " + ex.getMessage());
+            System.out.println("Não foi possível salvar o estado");
+            return respErr;
+        }
+    }
+    
+    public String loadState(){
+    	Connection conexao = null;
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	    
+    	String resp = "";
+    	
+    	
+    	try {
+    		System.out.println("Pegando estado do um determinado id");
+        	Class.forName(driver).newInstance();
+            conexao = DriverManager.getConnection(url + dbName, userName, password);
+            pst = conexao.prepareStatement("SELECT * FROM State");
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux = "{\"x\":\"" + rs.getString("x")+"\"";
+                aux += ",\"y\":\"" + String.valueOf(rs.getInt("y"))+"\"}";
+            }
+            if(aux.isEmpty()){
+            	resp = "[]";
+            } else {
+	            resp = "{\"response\": \"ok\", \"data\": " + aux + "}";
+            }
+			return resp;
+
+        } catch (Exception ex) {
+            System.out.println("Erro : " + ex.getMessage());
+			return resp ;
+        }
+    }
+    
     /*public static boolean verificaPlayer(int id) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         Connection conexao = null;
         PreparedStatement pst = null;
