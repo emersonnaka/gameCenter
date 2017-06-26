@@ -17,39 +17,59 @@ public class DAO {
     private final String userName = "root";
     private final String password = "root";
     private final String dbName = "web";
+    private final String gameTable = "Game";
+    private final String mediaTable = "Media";
+    private final String profileTable = "Profile";
+    private final String stateTable = "State";
     private final String trophyTable = "Trophy";
-    
-    /*public static boolean addPlayer(int id, String nome, String email) {
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        try {
-            Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = conexao.createStatement();
-            String sql = "INSERT INTO Player(id, name, email) VALUES (" + id + ",'" + nome + "','" + email + "')";
-
-            statement.execute(sql);
-            statement.close();
-            return true;
-
-        } catch (Exception ex) {
-            System.out.println("Erro : " + ex.getMessage());
-            return false;
-        }
-    }*/
     
     public DAO() {
     	String createDatabase = new String("CREATE DATABASE IF NOT EXISTS " + dbName);
+    	
+    	StringBuilder createGameTable = new StringBuilder();
+    	createGameTable.append("CREATE TABLE IF NOT EXISTS " + gameTable + "(");
+    	createGameTable.append("name varchar(100) NOT NULL,");
+    	createGameTable.append("description varchar(255) NOT NULL,");
+    	createGameTable.append("username varchar(255) NOT NULL,");
+    	createGameTable.append("PRIMARY KEY(name),");
+    	createGameTable.append("FOREIGN KEY(username) REFERENCES Profile(username))");
+
+    	StringBuilder createMediaTable = new StringBuilder();
+    	createMediaTable.append("CREATE TABLE IF NOT EXISTS " + mediaTable + "(");
+    	createMediaTable.append("id int(11) NOT NULL AUTO_INCREMENT,");
+    	createMediaTable.append("mimeType varchar(50) NOT NULL,");
+    	createMediaTable.append("src varchar(255) NOT NULL,");
+    	createMediaTable.append("name varchar(100) NOT NULL,");
+    	createMediaTable.append("PRIMARY KEY (id),");
+    	createMediaTable.append("FOREIGN KEY (name) REFERENCES Game(name))");
+    	
+    	StringBuilder createProfileTable = new StringBuilder();
+    	createProfileTable.append("CREATE TABLE IF NOT EXISTS " + profileTable + "(");
+    	createProfileTable.append("username varchar(255) NOT NULL,");
+    	createProfileTable.append("password varchar(20) NOT NULL,");
+    	createProfileTable.append("email varchar(255),");
+    	createProfileTable.append("lastLogin varchar(100) NOT NULL,");
+    	createProfileTable.append("PRIMARY KEY (username))");
+    	
+    	StringBuilder createStateTable = new StringBuilder();
+    	createStateTable.append("CREATE TABLE IF NOT EXISTS " + stateTable + "(");
+    	createStateTable.append("id int(11) NOT NULL AUTO_INCREMENT,");
+    	createStateTable.append("x int(11) NOT NULL,");
+    	createStateTable.append("y int(11) NOT NULL,");
+    	createStateTable.append("fase int(11) NOT NULL,");
+    	createStateTable.append("name varchar(100) NOT NULL,");
+    	createStateTable.append("PRIMARY KEY (id),");
+    	createStateTable.append("FOREIGN KEY (name) REFERENCES Game(name))");
+    	
     	StringBuilder createTrophyTable = new StringBuilder();
     	createTrophyTable.append("CREATE TABLE IF NOT EXISTS " + trophyTable + "(");
-    	createTrophyTable.append("`id` int(11) NOT NULL AUTO_INCREMENT, ");
-    	createTrophyTable.append("`name` varchar(255) DEFAULT NULL, ");
-    	createTrophyTable.append("`xp` int(11) DEFAULT NULL, ");
-    	createTrophyTable.append("`title` varchar(255) DEFAULT NULL, ");
-    	createTrophyTable.append("`description` varchar(255) DEFAULT NULL, ");
-    	createTrophyTable.append("PRIMARY KEY (`id`))");
+    	createTrophyTable.append("name varchar(100) NOT NULL,");
+    	createTrophyTable.append("xp int(11) NOT NULL,");
+    	createTrophyTable.append("title varchar(255) NOT NULL,");
+    	createTrophyTable.append("description varchar(255) NOT NULL,");
+    	createTrophyTable.append("nameGame varchar(100) NOT NULL,");
+    	createTrophyTable.append("PRIMARY KEY (name),");
+    	createTrophyTable.append("FOREIGN KEY (nameGame) REFERENCES Game(name))");
     	
     	try {
 			connectionDatabase = DriverManager.getConnection(url, userName, password);
@@ -57,6 +77,14 @@ public class DAO {
 			stmt.execute();
 			
 			connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+			stmt = connectionDatabase.prepareStatement(createProfileTable.toString());
+			stmt.execute();
+			stmt = connectionDatabase.prepareStatement(createGameTable.toString());
+			stmt.execute();
+			stmt = connectionDatabase.prepareStatement(createMediaTable.toString());
+			stmt.execute();
+			stmt = connectionDatabase.prepareStatement(createStateTable.toString());
+			stmt.execute();
 			stmt = connectionDatabase.prepareStatement(createTrophyTable.toString());
 			stmt.execute();
 			
