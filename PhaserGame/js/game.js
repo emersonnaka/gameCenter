@@ -19,7 +19,7 @@ class Game extends Phaser.Game {
 
 class PlayState extends Phaser.State {
 	preload() {
-		this.game.load.tilemap('level1', Config.ASSETS + 'phase1.json', null, Phaser.Tilemap.TILED_JSON)
+		this.game.load.tilemap('level1', Config.ASSETS + 'phase2.json', null, Phaser.Tilemap.TILED_JSON)
 		this.game.load.image('tiles', Config.ASSETS + 'tiles/tiles.png')
 		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
 		this.game.load.image('background', Config.ASSETS + 'background.png')
