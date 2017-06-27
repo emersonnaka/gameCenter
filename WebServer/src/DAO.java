@@ -70,8 +70,9 @@ public class DAO {
     	createTrophyTable.append("title varchar(255) NOT NULL,");
     	createTrophyTable.append("description varchar(255) NOT NULL,");
     	createTrophyTable.append("nameGame varchar(100) NOT NULL,");
-    	createTrophyTable.append("PRIMARY KEY (name),");
-    	createTrophyTable.append("FOREIGN KEY (nameGame) REFERENCES Game(name))");
+    	createTrophyTable.append("username varchar(255) NOT NULL,");
+    	createTrophyTable.append("FOREIGN KEY (nameGame) REFERENCES Game(name),");
+    	createTrophyTable.append("FOREIGN KEY (username) REFERENCES Profile(username))");
     	
     	try {
 			connectionDatabase = DriverManager.getConnection(url, userName, password);
@@ -213,7 +214,7 @@ public class DAO {
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
-    	String respErrJ = "{\"response\":\"error\", \"data\":\"jogo não existênte\"}";
+    	String respErrJ = "{\"response\":\"error\", \"data\":\"Troféu ja inserido para esse jogador nesse mapa\"}";
     	String respErr = "{\"response\":\"error2\", \"data\":\"Exceção não esperada\"}";
     	
         try {
@@ -221,25 +222,25 @@ public class DAO {
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
             Statement statement = connectionDatabase.createStatement();
-            pst = connectionDatabase.prepareStatement("SELECT name FROM " + gameTable + " WHERE username = ? AND name = ?");
+            pst = connectionDatabase.prepareStatement("SELECT name FROM " + trophyTable + " WHERE username = ? AND nameGame = ?");
             pst.setString(1, username);
             pst.setString(2, game);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
-                aux += rs.getString("name");
+                aux += rs.getString("name") + " ";
             }
-            if(aux == ""){
+            if(aux.contains(name)){
+
             	return respErrJ;
             } else {
-            	String sql = "INSERT INTO " + trophyTable + " (name, xp, title, description, nameGame) VALUES ( '" + name + "','" + xp + "','" + title 
-                		+ "','" + description + "','" + game + "')";
-                statement.execute(sql);
+            	String sql = "INSERT INTO " + trophyTable + " (name, xp, title, description, nameGame, username) VALUES ('" + name + "','" + xp 
+            			+ "','" + title + "','" + description + "','" + game + "','" + username + "')";
+            	statement.execute(sql);
                 statement.close();
                 System.out.println("Troféu inserido com sucesso!");
                 return respOk;
             }
-
         } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
             System.out.println("Troféu não inserido");
