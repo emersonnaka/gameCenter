@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ public class Multicast {
 		
 		this.host = "225.1.2.3";
 		this.port = 8889;
+		this.onlineMap = new HashMap<String, Long>();
 		this.group = InetAddress.getByName(this.host);
 		mSocket = new MulticastSocket(this.port);
 		mSocket.joinGroup(this.group);
@@ -48,7 +50,7 @@ public class Multicast {
 			public void run() {
 				try {
 					serverMulticast();
-				} catch (IOException e) {
+				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
@@ -86,7 +88,7 @@ public class Multicast {
 		}
 	}
 	
-	private void serverMulticast() throws IOException {
+	private void serverMulticast() throws IOException, InterruptedException {
 		String msg = new String();
 		String host = new String();
 		
@@ -99,6 +101,7 @@ public class Multicast {
 			if(!host.equals(InetAddress.getLocalHost().getHostAddress()) && msg.equals("[gameServer]")) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
 			}
+			TimeUnit.SECONDS.sleep(25);
 		}
 	}
 	
@@ -115,7 +118,7 @@ public class Multicast {
 					System.out.println(entry.getKey() + ": " + entry.getValue());
 				}
 			}
-			TimeUnit.SECONDS.sleep(20);
+			TimeUnit.SECONDS.sleep(22);
 		}
 	}
 	
