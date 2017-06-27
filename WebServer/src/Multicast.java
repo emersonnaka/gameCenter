@@ -11,7 +11,9 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 public class Multicast {
@@ -101,7 +103,7 @@ public class Multicast {
 			mSocket.receive(msgDataIn);
 			msg = new String(msgDataIn.getData(), 0, msgDataIn.getLength());
 			host = msgDataIn.getAddress().getHostAddress();
-			if(!host.equals(InetAddress.getLocalHost().getHostAddress()) && msg.equals("[gameServer]")) {
+			if(msg.equals("[gameServer]")) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
 				System.out.println("The server " + host + " is connected");
 			}
@@ -112,14 +114,17 @@ public class Multicast {
 		long difference, seconds;
 		
 		while(true) {
-			if(onlineMap.size() > 0) {
-				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
-					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
+			if(onlineMap.size() > 1) {
+				Iterator<Map.Entry<String, Long>> it = onlineMap.entrySet().iterator();
+				while(it.hasNext()) {
+					Map.Entry<String, Long> pair = (Map.Entry<String, Long>) it.next();
+					difference = Calendar.getInstance().getTimeInMillis() - pair.getValue();
 					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
 					if(seconds > 20) {
-						onlineMap.remove(entry.getKey());
-						System.out.println("The server " + entry.getKey() + " is disconnected");
+						onlineMap.remove(pair.getKey());
+						System.out.println("The server " + pair.getKey() + " is disconnected");
 					}
+					it.remove();
 				}
 			}
 			TimeUnit.SECONDS.sleep(22);
