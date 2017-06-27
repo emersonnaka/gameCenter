@@ -44,7 +44,7 @@ public final class WebServer {
         String urlParameters = "{\"id\":\"1\",\"op\":\"list-trophy\", \"data\":\"\"}";
         executePost(targetURL, urlParameters);*/
         
-        Multicast multicast = new Multicast();
+        //Multicast multicast = new Multicast();
         
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket
@@ -242,7 +242,9 @@ final class RequesteHandle implements Runnable {
         		break;
         		
         	case "list-trophy":
-        		response = dao.listTrophy();
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		response = dao.listTrophy(username,game);
         		break;
         		
         	case "get-trophy":

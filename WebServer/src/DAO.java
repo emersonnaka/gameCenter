@@ -231,7 +231,6 @@ public class DAO {
                 aux += rs.getString("name") + " ";
             }
             if(aux.contains(name)){
-
             	return respErrJ;
             } else {
             	String sql = "INSERT INTO " + trophyTable + " (name, xp, title, description, nameGame, username) VALUES ('" + name + "','" + xp 
@@ -311,7 +310,7 @@ public class DAO {
         }
     }
     
-    public String listTrophy() {
+    public String listTrophy(String username, String namegame) {
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	List<String> respAux = new ArrayList<String>();    
@@ -322,7 +321,9 @@ public class DAO {
     		System.out.println("Listando Troféus");
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable);
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE username = ? AND nameGame = ?");
+            pst.setString(1, username);
+            pst.setString(2, namegame);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
