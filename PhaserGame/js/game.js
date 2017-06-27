@@ -56,6 +56,11 @@ class PlayState extends Phaser.State {
 
         this.trophy = new Trophy(this.game)
         this.game.add.existing(this.trophy)
+
+        this.game.camera.flash(0x000000, 1000)
+        this.map.setTileIndexCallback(240, this.loadNextLevel, this)
+        this.levelCleared = false
+        this.addScore(0)
 	}
 
 	toogleFullScreen() {
@@ -127,8 +132,6 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.collide(this.player, this.trapsLayer, this.playerDied, null, this)
 
         this.game.physics.arcade.overlap(this.player, this.life, this.collectLife, null, this)
-
-        this.nextPhase()
 	}
 
 	collectCoin(player, coin) {
@@ -172,12 +175,24 @@ class PlayState extends Phaser.State {
 		this.lifeText.text = 'Irineu: ' + this.player.lifes
 	}
 
-	nextPhase() {
-		if(this.player.x >= 3940) {
-			this.game.camera.onFadeComplete.removeAll(this)
-        	this.game.state.start('Win')
-		}
-	}
+	loadNextLevel() {
+        if (!this.levelCleared) {
+            this.levelCleared = true
+            this.game.camera.fade(0x000000, 1000)
+            this.game.camera.onFadeComplete.add(this.changeLevel, this)
+        }
+    }
+
+    changeLevel() {
+        Config.LEVEL += 1
+        Config.SCORE = this.score
+        this.game.camera.onFadeComplete.removeAll(this)// bug
+        this.game.state.start('Win')
+        // if (Config.LEVEL <= 2)
+        //     this.game.state.restart()
+        // else
+        //     this.game.state.start('Title')
+    }
 
 	render() {
 		if(Config.DEBUG) {
