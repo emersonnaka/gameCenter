@@ -103,12 +103,12 @@ Templates.profileItem = Handlebars.compile(
 class ServerComm {
     static addTrophy(data, callback) {
         ServerComm.sendRequestTrophy(
-            'john_doe', 'irineus-adventure', 'add-trophy', data, callback)
+            'nelson', 'irineus-adventure', 'add-trophy', data, callback)
     }
 
     static listTrophy(callback) {
         ServerComm.sendRequestTrophy(
-            'john_doe', 'list-trophy', '', callback)
+            'nelson', 'irineus-adventure', 'list-trophy', '', callback)
     }
 
     static clearTrophy(callback) {
