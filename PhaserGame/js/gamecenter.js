@@ -79,16 +79,11 @@ class Trophy extends Phaser.Sprite {
     }
 
     addTrophyOnPage(trophyName) {
-/*
-        // DOM
-        let divTrophy = document.getElementById('div-trophy')
-        divTrophy.innerHTML += 
-        '<p>' + JSON.stringify(this.data['first death']) + '</p>'
-*/
-        // jQuery
-        $('#div-trophy').append(
-            '<p>' + JSON.stringify(this.data[trophyName]) + '</p>'
-        )
+
+        $('#trophies-list-empty-label').hide()
+
+        let html = Templates.trophiesListItem(this.data[trophyName])
+        $('#div-trophy').append(html)
     }
 
     removePanel() {
@@ -97,10 +92,18 @@ class Trophy extends Phaser.Sprite {
     }
 }
 
+class Templates {}
+Templates.trophiesListItem = Handlebars.compile(
+    $('#template-trophies-list-item').html()
+)
+Templates.profileItem = Handlebars.compile(
+    $('#template-profile-item').html()
+)
+
 class ServerComm {
     static addTrophy(data, callback) {
         ServerComm.sendRequestTrophy(
-            'john_doe', 'add-trophy', data, callback)
+            'john_doe', 'irineus-adventure', 'add-trophy', data, callback)
     }
 
     static listTrophy(callback) {
@@ -115,9 +118,10 @@ class ServerComm {
 
     // metodo generico a ser usado por todas as 
     // requisicoes de trofeus
-    static sendRequestTrophy(user, opName, opData, callback) {
+    static sendRequestTrophy(user, gameName, opName, opData, callback) {
         let data = {
             id: user,
+            game: gameName,
             op: opName,
             data: opData
         }
