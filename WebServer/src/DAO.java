@@ -4,7 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 //import java.util.ArrayList;
 import java.util.List;
 
@@ -96,20 +98,147 @@ public class DAO {
     	
     }
     
-    public String addTrophy(String name, int xp, String title, String description) {
+    public String addProfile(String username, String passwordP, String email){
     	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
-    	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
+    	String respErrSenha = "{\"response\":\"error\", \"data\":\"Id do usuário já existe em nossos servidores\"}";
+    	String respErr = "{\"response\":\"error\", \"data\":\"Alguma exceção não esperada\"}";
+    	Date date = new Date();
+    	String lastLogin = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
+
+    	try{
+	    	System.out.println("Inserindo o profile");
+	    	Class.forName(driver).newInstance();
+	        connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+	        Statement statement = connectionDatabase.createStatement();
+	        String sql = "INSERT INTO Profile(username, password, email, lastLogin) VALUES ( '" + username + "'," + passwordP + ",'" + email + "','" + lastLogin + "')";
+	        statement.execute(sql);
+	        statement.close();
+	        System.out.println("Perfil inserido com sucesso!");
+	        return respOk;
+    	} catch (Exception ex){
+    		if(ex.getMessage().contains("Duplicate")){
+    			System.out.println("Erro : " + ex.getMessage());
+        		return respErrSenha;
+    		} else {
+    			System.out.println("Erro : " + ex.getMessage());
+        		return respErr;
+    		}
+    	}
+    }
+    
+    public String queryProfile(String username, String passwordP){
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	/*response: 'ok', data: ' {lastLogin: '2017-06-3T18:25:43.511Z', email:'user@user.com'}'*/
+    	String respOk = "";
+    	String respErr = "{\"response\":\"error\", \"data\":\"Alguma exceção não esperada\"}";
+    	String respErrSenha = "{\"response\":\"error\", \"data\":\"Usuário ou senha inválidos\"}";
+    	
+    	try{
+    		System.out.println("Procurando profile");
+    		Class.forName(driver).newInstance();
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            pst = connectionDatabase.prepareStatement("SELECT lastLogin, email FROM " + profileTable + " WHERE username = ? AND password = ?");
+            pst.setString(1, username);
+            pst.setString(2, passwordP);
+            rs = pst.executeQuery();
+            String aux = null;
+            while (rs.next()) {
+                aux = "{\"lastLogin\":\"" + rs.getString("lastLogin")+"\"";
+                aux += ",\"email\":\"" + rs.getString("email")+"\"}";
+            }
+            if(aux == null){
+            	return respErrSenha;
+            } else {
+            	respOk = "{\"response\":\"ok\", \"data\":"+ aux + "}";
+                return respOk;
+            }
+    	} catch (Exception ex){
+    		System.out.println("Erro: " + ex.getMessage());
+    		return respErr;
+    	}    	
+    }
+    
+    public String addGame(String username, String game, String name, String description){
+
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	String respOk1 = "{\"response\":\"ok1\", \"data\":\"Jogo adicionado com sucesso ao usuário\"}";
+    	String respOk2 = "{\"response\":\"ok2\", \"data\":\"Jogo já existente para o usuáro, operação ignorada\"}";
+    	String respErrE = "{\"response\":\"error\", \"data\":\"Usuário não existente\"}";
+    	String respErr = "{\"response\":\"error2\", \"data\":\"Alguma exceção não esperada\"}";
+    	try{
+	    	System.out.println("Adicionando jogo");
+			Class.forName(driver).newInstance();
+	        connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+	        pst = connectionDatabase.prepareStatement("SELECT email FROM " + profileTable + " WHERE username = ?");
+	        pst.setString(1, username);
+	        rs = pst.executeQuery();
+	        String aux = null;
+	        while (rs.next()) {
+	            aux = rs.getString("email");
+	        }
+	        if(aux == null){
+	        	return respErrE;
+	        } else {
+	        	pst = connectionDatabase.prepareStatement("SELECT name FROM " + gameTable + " WHERE username = ? AND name = ?");
+		        pst.setString(1, username);
+		        pst.setString(2, game);
+		        rs = pst.executeQuery();
+		        aux = null;
+		        while (rs.next()) {
+		            aux += rs.getString("name");
+		        }
+
+		        if(aux == null){
+		        	Statement statement = connectionDatabase.createStatement();
+		        	String sql = "INSERT INTO " + gameTable + " (name, description, username) VALUES ('" + name + "', '" 
+		        					+ description + "', '" + username + "')";
+		        	System.out.println("INSERINDO JOGO");
+		        	statement.execute(sql);
+		        	statement.close();
+		        	System.out.println("Jogo inserido com sucesso");
+		        	return respOk1;
+		        } else {
+		            return respOk2;
+		        }
+	        }
+    	} catch (Exception ex){
+    		System.out.println("Erro: " + ex.getMessage());
+    		return respErr;
+    	}
+    }
+    
+    public String addTrophy(String username, String game, String name, int xp, String title, String description) {
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
+    	String respErrJ = "{\"response\":\"error\", \"data\":\"jogo não existênte\"}";
+    	String respErr = "{\"response\":\"error2\", \"data\":\"Exceção não esperada\"}";
     	
         try {
         	System.out.println("Inserindo o troféu");
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
             Statement statement = connectionDatabase.createStatement();
-            String sql = "INSERT INTO Trophy(name, xp, title, description) VALUES ( '" + name + "'," + xp + ",'" + title + "','" + description + "')";
-            statement.execute(sql);
-            statement.close();
-            System.out.println("Troféu inserido com sucesso!");
-            return respOk;
+            pst = connectionDatabase.prepareStatement("SELECT name FROM " + gameTable + " WHERE username = ? AND name = ?");
+            pst.setString(1, username);
+            pst.setString(2, game);
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux += rs.getString("name");
+            }
+            if(aux == ""){
+            	return respErrJ;
+            } else {
+            	String sql = "INSERT INTO " + trophyTable + " (name, xp, title, description, nameGame) VALUES ( '" + name + "','" + xp + "','" + title 
+                		+ "','" + description + "','" + game + "')";
+                statement.execute(sql);
+                statement.close();
+                System.out.println("Troféu inserido com sucesso!");
+                return respOk;
+            }
 
         } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
@@ -118,7 +247,7 @@ public class DAO {
         }
     }
     
-    public String getTrophy(String data){
+    public String getTrophy(String data, String username, String game){
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	String respOk = "";
@@ -126,21 +255,33 @@ public class DAO {
     	
     	try {
     		System.out.println("Procurando por troféu");
-    		Class.forName(driver).newInstance();
-            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE name = ?");
-            pst.setString(1, data);
+    		
+    		pst = connectionDatabase.prepareStatement("SELECT name, username FROM " + gameTable + " WHERE username = ? AND name = ?");
+            pst.setString(1, username);
+            pst.setString(2, game);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
-                aux = "{\"name\":\"" + rs.getString("name")+"\"";
-                aux += ",\"xp\":\"" + String.valueOf(rs.getInt("xp"))+"\"";
-                aux += ",\"title\":\"" + rs.getString("title")+"\"";
-                aux += ",\"description\":\"" + rs.getString("description") +"\"" + "}";
+                aux += rs.getString("name");
             }
-            respOk = "\"response\":\"ok\", \"data\": \"" + aux + "\"";
-            return respOk;
-    		
+            if(aux == ""){
+            	return respErr;
+            } else {
+            	Class.forName(driver).newInstance();
+                connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+                pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE name = ?");
+                pst.setString(1, data);
+                rs = pst.executeQuery();
+                aux = "";
+                while (rs.next()) {
+                    aux = "{\"name\":\"" + rs.getString("name")+"\"";
+                    aux += ",\"xp\":\"" + String.valueOf(rs.getInt("xp"))+"\"";
+                    aux += ",\"title\":\"" + rs.getString("title")+"\"";
+                    aux += ",\"description\":\"" + rs.getString("description") +"\"" + "}";
+                }
+                respOk = "\"response\":\"ok\", \"data\": \"" + aux + "\"";
+                return respOk;
+            }
     	} catch (Exception ex) {
     		System.out.println("Troféu não encontrado");
     		return respErr;

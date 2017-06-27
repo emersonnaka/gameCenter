@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.org.glassfish.gmbal.Description;
 
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -42,6 +43,8 @@ public final class WebServer {
         /*String targetURL = "http://192.168.43.133:8081";
         String urlParameters = "{\"id\":\"1\",\"op\":\"list-trophy\", \"data\":\"\"}";
         executePost(targetURL, urlParameters);*/
+        
+        Multicast multicast = new Multicast();
         
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket
@@ -197,35 +200,69 @@ final class RequesteHandle implements Runnable {
         String op = "";
         String response = "";
 		String name;
-        
+		String username;
+		String password;
+		String game;
+        String description;
+		
         op = obj.get("op").getAsString();
 
         switch(op){
+
+        	case "add-profile":
+        		username = obj.get("id").getAsString();
+        		jsonData = obj.getAsJsonObject("data");
+        		password = jsonData.get("password").getAsString();
+        		String email = jsonData.get("email").getAsString();
+        		response = dao.addProfile(username, password, email);
+        		break;
+        	case "query-profile":
+        		username = obj.get("id").getAsString();
+        		jsonData = obj.getAsJsonObject("data");
+        		password = jsonData.get("password").getAsString();
+        		response = dao.queryProfile(username, password);
+        		break;
+        	case "add-game":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		jsonData = obj.getAsJsonObject("data");
+        		name = jsonData.get("name").getAsString();
+        		description = jsonData.get("description").getAsString();
+        		response = dao.addGame(username, game, name, description);
+        		break;
         	case "add-trophy":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
         		jsonData = obj.getAsJsonObject("data");
         		name = jsonData.get("name").getAsString();
         		int xp = jsonData.get("xp").getAsInt();
         		String title = jsonData.get("title").getAsString();
-        		String description = jsonData.get("description").getAsString();
-        		System.out.println(name + xp + title + description);
-        		response = dao.addTrophy(name, xp, title, description);
+        		description = jsonData.get("description").getAsString();
+        		response = dao.addTrophy(username, game, name, xp, title, description);
         		break;
+        		
         	case "list-trophy":
         		response = dao.listTrophy();
         		break;
+        		
         	case "get-trophy":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
         		name = obj.get("data").getAsString();
-        		response = dao.getTrophy(name);
+        		response = dao.getTrophy(name, username, game);
         		break;
+        		
         	case "clear-trophy":
         		response = dao.clearTrophy();
         		break;
+        		
         	case "save-state":
         		jsonData = obj.getAsJsonObject("data");
         		int x = jsonData.get("x").getAsInt();
         		int y = jsonData.get("y").getAsInt();
         		response = dao.saveState(x, y);
         		break;
+        		
         	case "load-state":
         		response = dao.loadState();
         }
@@ -316,10 +353,16 @@ final class RequesteHandle implements Runnable {
         content.append("<pre><a href=''>Name</a>                                                 <a href=''>Last modified</a>      <a href=''>Size</a><hr>");
         for(File f: file.listFiles()){
         	if(!f.isHidden()) {
-	            content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
+        		if(f.getName().length() < 50)
+        			content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName() + "</a>");
+        		else
+        			content.append("<a href= '" + f.getAbsolutePath() + "'>" + f.getName().substring(0, 47) + "..." + "</a>");
 	            Calendar lastModified = Calendar.getInstance();
 	            lastModified.setTimeInMillis(f.lastModified());
-	            content.append(new String(new char[50 - f.getName().length()]).replace("\0",  " ") + "   ").append(DateFormat.getInstance().format(lastModified.getTime()));
+	            if(f.getName().length() < 50)
+	            	content.append(new String(new char[50 - f.getName().length()]).replace("\0",  " ") + "   ").append(DateFormat.getInstance().format(lastModified.getTime()));
+	            else
+	            	content.append(new String().replace("\0",  " ") + "   ").append(DateFormat.getInstance().format(lastModified.getTime()));
 	            content.append("     ").append(f.length());
 	            content.append("<br>");
         	}
@@ -532,6 +575,13 @@ final class RequesteHandle implements Runnable {
         if (fileName.endsWith(".pdf")) {
             return "application/pdf";
         }
+        if (fileName.endsWith(".css")) {
+            return "text/css";
+        }
+        if (fileName.endsWith(".png")) {
+            return "image/png";
+        }
+        
         return "application/octet-stream";
     }
 }
