@@ -4,6 +4,8 @@ Config.HEIGHT= 480
 Config.DEBUG = false
 Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
+Config.LEVEL = 1
+Config.SCORE = 0
 
 class Game extends Phaser.Game {
     constructor() {
@@ -17,9 +19,40 @@ class Game extends Phaser.Game {
     }
 }
 
+class GameState extends Phaser.State {
+    create() {
+        let fullScreenButton = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
+        fullScreenButton.onDown.add(this.toggleFullScreen, this)    
+
+        this.scaleGame()
+    }
+
+    toggleFullScreen() {
+        this.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        if (this.scale.isFullScreen) {
+            this.scale.stopFullScreen();
+        } else {
+            this.scale.startFullScreen(false);
+        }
+    }
+
+    scaleGame() {
+        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE //RESIZE
+
+        // escala da tela        
+        this.game.scale.setResizeCallback(function(scale, parentBounds) {
+            //this.game.scale.setMaximum()
+            let scaleX = Config.CONTAINER_WIDTH / Config.WIDTH
+            let scaleY = Config.CONTAINER_HEIGHT / Config.HEIGHT
+
+            this.game.scale.setUserScale(scaleX, scaleY, 0, 0)
+        }, this)        
+    }
+}
+
 class PlayState extends Phaser.State {
 	preload() {
-		this.game.load.tilemap('level1', Config.ASSETS + 'phase2.json', null, Phaser.Tilemap.TILED_JSON)
+		this.game.load.tilemap('level1', Config.ASSETS + `phase${Config.LEVEL}.json`, null, Phaser.Tilemap.TILED_JSON)
 		this.game.load.image('tiles', Config.ASSETS + 'tiles/tiles.png')
 		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
 		this.game.load.image('background', Config.ASSETS + 'background.png')
@@ -34,6 +67,8 @@ class PlayState extends Phaser.State {
 	}
 
 	create() {
+		super.create()
+
 		this.game.physics.startSystem(Phaser.Physics.ARCADE)
         this.game.stage.backgroundColor = '#000000'
 		
@@ -44,8 +79,6 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.gravity.y = 550
         this.score = 0
 
-        let fullScreenButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE)
-        fullScreenButton.onDown.add(this.toogleFullScreen, this)
         let screenshotButton = this.game.input.keyboard.addKey(Phaser.Keyboard.P)
         screenshotButton.onDown.add(this.takeScreenShot, this)
 
@@ -187,11 +220,10 @@ class PlayState extends Phaser.State {
         Config.LEVEL += 1
         Config.SCORE = this.score
         this.game.camera.onFadeComplete.removeAll(this)// bug
-        this.game.state.start('Win')
-        // if (Config.LEVEL <= 2)
-        //     this.game.state.restart()
-        // else
-        //     this.game.state.start('Title')
+        if (Config.LEVEL <= 3)
+            this.game.state.restart()
+        else
+            this.game.state.start('Win')
     }
 
 	render() {
