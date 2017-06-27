@@ -11,9 +11,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 public class Multicast {
@@ -115,16 +113,13 @@ public class Multicast {
 		
 		while(true) {
 			if(onlineMap.size() > 1) {
-				Iterator<Map.Entry<String, Long>> it = onlineMap.entrySet().iterator();
-				while(it.hasNext()) {
-					Map.Entry<String, Long> pair = (Map.Entry<String, Long>) it.next();
-					difference = Calendar.getInstance().getTimeInMillis() - pair.getValue();
+				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
+					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
 					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
 					if(seconds > 20) {
-						onlineMap.remove(pair.getKey());
-						System.out.println("The server " + pair.getKey() + " is disconnected");
+						onlineMap.remove(entry.getKey());
+						System.out.println("The server " + entry.getKey() + " is disconnected");
 					}
-					it.remove();
 				}
 			}
 			TimeUnit.SECONDS.sleep(22);
