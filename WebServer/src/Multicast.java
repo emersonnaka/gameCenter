@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -75,13 +77,10 @@ public class Multicast {
 		verifyOnlineServersThread.start();
 		System.out.println("Verify online servers is running");
 		
-		clientThread.join();
-		serverThread.join();
-		verifyOnlineServersThread.join();
 	}
 	
 	private void clientMulticast() throws IOException, InterruptedException {
-		final String msg = new String("[gameServer]");
+		final String msg = new String("GameServer");
 		
 		while(true) {
 			byte[] msgByte = msg.getBytes();
@@ -101,7 +100,7 @@ public class Multicast {
 			mSocket.receive(msgDataIn);
 			msg = new String(msgDataIn.getData(), 0, msgDataIn.getLength());
 			host = msgDataIn.getAddress().getHostAddress();
-			if(msg.equals("[gameServer]")) {
+			if(msg.contains("GameServer")) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
 				System.out.println("The server " + host + " is connected");
 			}
@@ -110,19 +109,29 @@ public class Multicast {
 	
 	private void verifyOnlineServers() throws InterruptedException {
 		long difference, seconds;
+		boolean remove = false;
+		List<String> removeHost;
 		
 		while(true) {
+			removeHost = new ArrayList<String>();
 			if(onlineMap.size() > 1) {
 				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
 					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
 					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
 					if(seconds > 20) {
-						onlineMap.remove(entry.getKey());
-						System.out.println("The server " + entry.getKey() + " is disconnected");
+						remove = true;
+						removeHost.add(entry.getKey());
 					}
 				}
+				if(remove) {
+					for(String host : removeHost) {
+						onlineMap.remove(host);
+						System.out.println("The server " + host + " is disconnected");
+					}
+					remove = false;
+				}
 			}
-			TimeUnit.SECONDS.sleep(22);
+			TimeUnit.SECONDS.sleep(5);
 		}
 	}
 	
