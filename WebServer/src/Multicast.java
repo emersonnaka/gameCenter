@@ -44,6 +44,7 @@ public class Multicast {
 		};
 		Thread clientThread = new Thread(clientRun);
 		clientThread.start();
+		System.out.println("Client is running");
 		
 		Runnable serverRun = new Runnable() {
 			@Override
@@ -57,6 +58,7 @@ public class Multicast {
 		};
 		Thread serverThread = new Thread(serverRun);
 		serverThread.start();
+		System.out.println("Server is running");
 		
 		Runnable verifyOnlineServersRun = new Runnable() {
 			@Override
@@ -71,6 +73,7 @@ public class Multicast {
 		};
 		Thread verifyOnlineServersThread = new Thread(verifyOnlineServersRun);
 		verifyOnlineServersThread.start();
+		System.out.println("Verify online servers is running");
 		
 		clientThread.join();
 		serverThread.join();
@@ -113,9 +116,11 @@ public class Multicast {
 				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
 					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
 					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
-					if(seconds > 20)
-						onlineMap.remove(entry.getKey());
 					System.out.println(entry.getKey() + ": " + entry.getValue());
+					if(seconds > 20) {
+						onlineMap.remove(entry.getKey());
+						System.out.println("The server " + entry.getKey() + " disconnected");
+					}
 				}
 			}
 			TimeUnit.SECONDS.sleep(22);
