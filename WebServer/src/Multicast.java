@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Calendar;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Multicast {
 	
@@ -18,12 +19,12 @@ public class Multicast {
 	String host;
 	int port;
 	InetAddress group;
-	Map<String, String> onlineMap;	
+	Map<String, Long> onlineMap;	
 
-	public Multicast(String host, int port) throws IOException, InterruptedException {
+	public Multicast() throws IOException, InterruptedException {
 		
-		this.host = host;
-		this.port = port;
+		this.host = "225.1.2.3";
+		this.port = 8889;
 		this.group = InetAddress.getByName(this.host);
 		mSocket = new MulticastSocket(this.port);
 		mSocket.joinGroup(this.group);
@@ -33,7 +34,8 @@ public class Multicast {
 			public void run() {
 				try {
 					clientMulticast();
-				} catch (IOException e) {
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -54,52 +56,70 @@ public class Multicast {
 		Thread serverThread = new Thread(serverRun);
 		serverThread.start();
 		
+		Runnable verifyOnlineServersRun = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					verifyOnlineServers();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+		Thread verifyOnlineServersThread = new Thread(verifyOnlineServersRun);
+		verifyOnlineServersThread.start();
+		
 		clientThread.join();
 		serverThread.join();
+		verifyOnlineServersThread.join();
 	}
 	
-	private void clientMulticast() throws IOException {
+	private void clientMulticast() throws IOException, InterruptedException {
+		final String msg = new String("[gameServer]");
 		
-		Scanner scanner = new Scanner(System.in);
-		String nickname = new String();
-		String msg = new String();
-		
-		System.out.print("Input your nickname: ");
-		nickname = scanner.nextLine();
-		
-		while(!msg.equalsIgnoreCase("Fim")) {
-			msg = new String(scanner.nextLine());
-			msg = nickname + "|||" + msg;
+		while(true) {
 			byte[] msgByte = msg.getBytes();
 			DatagramPacket msgDataOut = new DatagramPacket(msgByte,  msg.length(), this.group, this.port);
 			mSocket.send(msgDataOut);
+			TimeUnit.SECONDS.sleep(20);
 		}
-		
-		scanner.close();
 	}
 	
 	private void serverMulticast() throws IOException {
-		String nickname = new String();
 		String msg = new String();
+		String host = new String();
 		
-		while(!msg.equalsIgnoreCase("Fim")) {
+		while(true) {
 			byte[] msgByte = new byte[1000];
 			DatagramPacket msgDataIn = new DatagramPacket(msgByte, msgByte.length);
 			mSocket.receive(msgDataIn);
-			msg = new String(msgDataIn.getData());
-			nickname = msg.split("\\|\\|\\|")[0].trim();
-			msg = msg.split("\\|\\|\\|")[1].trim();
-			
-			System.out.println(nickname + ": " + msg);
+			msg = new String(msgDataIn.getData(), 0, msgDataIn.getLength());
+			host = msgDataIn.getAddress().getHostAddress();
+			if(!host.equals(InetAddress.getLocalHost().getHostAddress()) && msg.equals("[gameServer]")) {
+				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
+			}
 		}
+	}
+	
+	private void verifyOnlineServers() throws InterruptedException {
+		long difference, seconds;
 		
+		while(true) {
+			if(onlineMap.size() > 0) {
+				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
+					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
+					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
+					if(seconds > 20)
+						onlineMap.remove(entry.getKey());
+					System.out.println(entry.getKey() + ": " + entry.getValue());
+				}
+			}
+			TimeUnit.SECONDS.sleep(20);
+		}
 	}
 	
 	public static void main(String args[]) throws NumberFormatException, IOException, InterruptedException {
-		if(args.length == 2) {
-			new Multicast(args[0], Integer.parseInt(args[1]));
-		} else {
-			System.out.println("Insert in command line: \"java Multicast ip port\" ");
-		}
+		new Multicast();
 	}
 }
