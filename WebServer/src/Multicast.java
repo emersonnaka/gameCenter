@@ -103,6 +103,7 @@ public class Multicast {
 			host = msgDataIn.getAddress().getHostAddress();
 			if(!host.equals(InetAddress.getLocalHost().getHostAddress()) && msg.equals("[gameServer]")) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
+				System.out.println("The server " + host + " is connected");
 			}
 		}
 	}
@@ -115,10 +116,9 @@ public class Multicast {
 				for(Map.Entry<String, Long> entry : onlineMap.entrySet()) {
 					difference = Calendar.getInstance().getTimeInMillis() - entry.getValue();
 					seconds = TimeUnit.MILLISECONDS.toSeconds(difference);
-					System.out.println(entry.getKey() + ": " + entry.getValue());
 					if(seconds > 20) {
 						onlineMap.remove(entry.getKey());
-						System.out.println("The server " + entry.getKey() + " disconnected");
+						System.out.println("The server " + entry.getKey() + " is disconnected");
 					}
 				}
 			}
