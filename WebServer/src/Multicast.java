@@ -104,7 +104,6 @@ public class Multicast {
 			if(!host.equals(InetAddress.getLocalHost().getHostAddress()) && msg.equals("[gameServer]")) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
 			}
-			TimeUnit.SECONDS.sleep(25);
 		}
 	}
 	
