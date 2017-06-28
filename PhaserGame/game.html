@@ -12,7 +12,16 @@
     var user = document.getElementById('input-user').value
     var pass = document.getElementById('input-pass').value
     ServerComm.sendQueryProfile(user, 'query-profile', pass,
-        (response) => this.verifyProfile(response))
+        (response) => this.verifyProfile(response, user))
+  }
+
+  function verifyProfile(json, user){
+        let resp = JSON.parse(JSON.stringify(json))
+        if (resp['response'] == 'error'){
+            console.log(resp['data'])
+        } else {
+          Config.USERNAME = user
+        }
   }
 </script>
 
