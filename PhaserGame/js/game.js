@@ -7,6 +7,8 @@ Config.ASSETS = 'assets/'
 Config.LEVEL = 1
 Config.SCORE = 0
 Config.GAMENAME = 'irineus-adventure'
+Config.X = 30
+Config.Y = 900
 Config.USERNAME
 
 class Game extends Phaser.Game {
@@ -135,8 +137,8 @@ class PlayState extends Phaser.State {
 	}
 
 	createPlayer() {
-        this.xSave = 30
-        this.ySave = 900
+        this.xSave = Config.X
+        this.ySave = Config.Y
 		this.player = new Player(this.game, this.keys, this.xSave, this.ySave, 'character')
 		this.game.add.existing(this.player)
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1)

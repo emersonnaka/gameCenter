@@ -2,8 +2,11 @@
 class TitleState extends Phaser.State {
     preload() {
         // mapa
+        this.hasSave = false
         this.game.load.image('titleScreen', Config.ASSETS + 'titleScreen.jpg')
         this.game.load.image('title',Config.ASSETS + 'IrineusAdventure.png')
+        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'load-state', 0, 0, 0,
+            (response) => this.verifyState(response))
     }
 
     create() {
@@ -19,6 +22,17 @@ class TitleState extends Phaser.State {
         this.pressStart.anchor.setTo(0.5, 0.5)
         this.pressStart.x = this.game.width/2
         this.pressStart.y = 300
+
+        if(this.hasSave) {
+            this.initSave = this.game.add.text(0, 0, 'Press SPACE to continue', {fontSize: '16px', fill: '#000000'})
+            this.initSave.anchor.setTo(0.5, 0.5)
+            this.initSave.x = this.game.width/2
+            this.initSave.y = 400
+
+            let spaceButton = this.game.input.keyboard.addKey(
+                Phaser.Keyboard.SPACE)
+            spaceButton.onDown.add(this.continueGame, this)
+        }
 
         let fullScreenButton = this.game.input.keyboard.addKey(
             Phaser.Keyboard.ONE)
@@ -36,6 +50,13 @@ class TitleState extends Phaser.State {
         this.game.add.tween(this.pressStart).to({alpha: 0}, 500).to({alpha: 1}, 500).loop(-1).start()
 
         this.pressed = false
+    }
+
+    continueGame() {
+        Config.X = this.xSave
+        Config.Y = this.ySave
+        Config.LEVEL = this.phaseSave
+        startFade()
     }
 
     startFade() {
@@ -60,6 +81,15 @@ class TitleState extends Phaser.State {
             this.game.scale.stopFullScreen()
         else
             this.game.scale.startFullScreen(false)
+    }
+
+    verifyState(response) {
+        if (response['response'] == 'ok') {
+            this.hasSave = true
+            this.xSave = response['data']['x']
+            this.ySave = response['data']['y']
+            this.phaseSave = response['data']['phase']
+        }
     }
 
     update() {
