@@ -16,12 +16,12 @@
   }
 
   function verifyProfile(json, user){
-        let resp = JSON.parse(JSON.stringify(json))
-        if (resp['response'] == 'error'){
-            console.log(resp['data'])
-        } else {
-          Config.USERNAME = user
-        }
+    let resp = JSON.parse(JSON.stringify(json))
+    if (resp['response'] == 'error'){
+      console.log(resp['data'])
+    } else {
+      Config.USERNAME = user
+    }
   }
 </script>
 
