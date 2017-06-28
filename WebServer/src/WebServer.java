@@ -43,7 +43,7 @@ public final class WebServer {
         String urlParameters = "{\"id\":\"1\",\"op\":\"list-trophy\", \"data\":\"\"}";
         executePost(targetURL, urlParameters);*/
         
-        //Multicast multicast = new Multicast();
+        Multicast multicast = new Multicast();
         
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket

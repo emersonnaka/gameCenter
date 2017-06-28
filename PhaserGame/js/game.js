@@ -68,6 +68,8 @@ class PlayState extends Phaser.State {
 		this.game.load.spritesheet('lifes', Config.ASSETS + 'objects/lifes.png', 32, 32)
         this.game.load.spritesheet('checkpoint', Config.ASSETS + 'objects/Mushroom_2.png', 42, 42)
         this.game.load.spritesheet('snake', Config.ASSETS + 'objects/snake.png', 64, 32)
+        this.game.load.spritesheet('bat', Config.ASSETS + 'objects/bat.png', 32, 32)
+        this.game.load.spritesheet('crazy', Config.ASSETS + 'objects/crazy.png', 64, 32)
 
 		this.game.load.image('trophy', Config.ASSETS + 'objects/trophy.png')
 	}
@@ -160,7 +162,15 @@ class PlayState extends Phaser.State {
     createEnemies() {
         this.snakes = this.game.add.group()
         this.map.createFromObjects('Collection Layer', 483, 'snake', 0, true, false, this.snakes, Snake)
-        this.snakes.forEach( (Snake) => Snake.start() )
+        this.snakes.forEach( (snake) => snake.start() )
+
+        this.bats = this.game.add.group()
+        this.map.createFromObjects('Collection Layer', 487, 'bat', 0, true, false, this.bats, Bat)
+        this.bats.forEach( (bat) => bat.start() )
+
+        this.crazies = this.game.add.group()
+        this.map.createFromObjects('Collection Layer', 491, 'crazy', 0, true, false, this.crazies, Crazy)
+        this.crazies.forEach( (crazy) => crazy.start() )
     }
 
 	createHud() {
@@ -188,6 +198,10 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.overlap(this.player, this.check, this.checkpoint, null, this)
 
         this.game.physics.arcade.overlap(this.player, this.snakes, this.playerDied, null, this)
+
+        this.game.physics.arcade.overlap(this.player, this.bats, this.playerDied, null, this)
+
+        this.game.physics.arcade.overlap(this.player, this.crazies, this.playerDied, null, this)
 	}
 
 	collectCoin(player, coin) {
