@@ -414,6 +414,23 @@
          "tileheight":32,
          "tilewidth":32,
          "transparentcolor":"#ff00ff"
+        }, 
+        {
+         "firstgid":479,
+         "image":"objects\/Mushroom_2.png",
+         "imageheight":42,
+         "imagewidth":42,
+         "margin":0,
+         "name":"checkpoint",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":42,
+         "tilewidth":42,
+         "transparentcolor":"#ff00ff"
         }],
  "tilewidth":21,
  "version":1,
