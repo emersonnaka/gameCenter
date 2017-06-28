@@ -259,14 +259,19 @@ final class RequesteHandle implements Runnable {
         		break;
         		
         	case "save-state":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
         		jsonData = obj.getAsJsonObject("data");
         		int x = jsonData.get("x").getAsInt();
         		int y = jsonData.get("y").getAsInt();
-        		response = dao.saveState(x, y);
+        		int fase = jsonData.get("fase").getAsInt();
+        		response = dao.saveState(x, y, fase, username, game);
         		break;
         		
         	case "load-state":
-        		response = dao.loadState();
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		response = dao.loadState(username, game);
         }
         return response.getBytes();
 	}

@@ -55,13 +55,13 @@ public class DAO {
     	
     	StringBuilder createStateTable = new StringBuilder();
     	createStateTable.append("CREATE TABLE IF NOT EXISTS " + stateTable + "(");
-    	createStateTable.append("id int(11) NOT NULL AUTO_INCREMENT,");
     	createStateTable.append("x int(11) NOT NULL,");
     	createStateTable.append("y int(11) NOT NULL,");
     	createStateTable.append("fase int(11) NOT NULL,");
-    	createStateTable.append("name varchar(100) NOT NULL,");
-    	createStateTable.append("PRIMARY KEY (id),");
-    	createStateTable.append("FOREIGN KEY (name) REFERENCES Game(name))");
+    	createStateTable.append("gamename varchar(100) NOT NULL,");
+    	createStateTable.append("username varchar(255) NOT NULL,");
+    	createStateTable.append("FOREIGN KEY (gamename) REFERENCES Game(name),");
+    	createStateTable.append("FOREIGN KEY (username) REFERENCES Profile(username))");
     	
     	StringBuilder createTrophyTable = new StringBuilder();
     	createTrophyTable.append("CREATE TABLE IF NOT EXISTS " + trophyTable + "(");
@@ -352,20 +352,45 @@ public class DAO {
         }
 	}
 
-    public String saveState(int x, int y){
+    public String saveState(int x, int y, int fase, String username, String gamename){
     	Connection conexao = null;
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	
     	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
     	String respErr = "{\"response\":\"no\", \"data\":\"\"}";
     	
         try {
         	Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = conexao.createStatement();
-            String sql = "INSERT INTO State(x, y) VALUES ("+ x + ", " + y + ")";
-            statement.execute(sql);
-            statement.close();
-            System.out.println("Estado salvo!");
-            return respOk;
+            pst = conexao.prepareStatement("SELECT fase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
+            pst.setString(1, username);
+            pst.setString(2, gamename);
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux += String.valueOf(rs.getInt("fase"));
+            }
+            if(aux == ""){
+            	Statement statement = conexao.createStatement();
+                String sql = "INSERT INTO " + stateTable + " (x, y, fase, gamename, username) VALUES ("+ x + ", " + y + ", " 
+                											  + fase + ",'" + gamename + "','" + username + "')";
+                statement.execute(sql);
+                statement.close();
+                System.out.println("Estado salvo!");
+                return respOk;
+            } else {
+            	pst = conexao.prepareStatement("UPDATE " + stateTable + " SET x=?, y=?, fase=? WHERE username=? AND gamename=?");
+            	pst.setInt(1, x);
+                pst.setInt(2, y);
+                pst.setInt(3, fase);
+                pst.setString(4, username);
+                pst.setString(5, gamename);
+                pst.executeUpdate();
+                pst.close();
+            	return respOk;
+            }
+            
 
         } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
@@ -374,7 +399,7 @@ public class DAO {
         }
     }
     
-    public String loadState(){
+    public String loadState(String username, String gamename){
     	Connection conexao = null;
     	PreparedStatement pst = null;
     	ResultSet rs = null;
@@ -383,24 +408,28 @@ public class DAO {
     	
     	
     	try {
-    		System.out.println("Pegando estado do um determinado id");
+    		System.out.println("Loading state");
         	Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
-            pst = conexao.prepareStatement("SELECT * FROM State");
+            pst = conexao.prepareStatement("SELECT x, y, fase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
+            pst.setString(1, username);
+            pst.setString(2, gamename);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
-                aux = "{\"x\":\"" + rs.getString("x")+"\"";
-                aux += ",\"y\":\"" + String.valueOf(rs.getInt("y"))+"\"}";
+                aux = "{\"x\":\"" + String.valueOf(rs.getInt("x"))+"\"";
+                aux += ",\"y\":\"" + String.valueOf(rs.getInt("y"))+"\"";
+                aux += ",\"state\":\"" + String.valueOf(rs.getInt("fase"))+"\"}";
             }
             if(aux.isEmpty()){
-            	resp = "[]";
+            	resp = "{\"response\":\"erro\",\"data\":\"\"}";
             } else {
-	            resp = "{\"response\": \"ok\", \"data\": " + aux + "}";
+	            resp = "{\"response\":\"ok\",\"data\":" + aux + "}";
             }
 			return resp;
 
         } catch (Exception ex) {
+        	resp = "{\"response\":\"erro\",\"data\":\"\"}";
             System.out.println("Erro : " + ex.getMessage());
 			return resp ;
         }

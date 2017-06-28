@@ -141,6 +141,7 @@ class ServerComm {
             op: opName,
             data: {password}
         }
+        console.log("To aca")
         ServerComm.ajaxPost(data, callback)
     }
 
@@ -155,7 +156,7 @@ class ServerComm {
     }
 
     static ajaxPost(data, callback) {
-        let url = 'http://localhost:8081/game/profile'
+        let url = 'http://192.168.25.183:8081/game/profile'
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
                 console.log(data)
