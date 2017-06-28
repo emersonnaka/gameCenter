@@ -144,6 +144,16 @@ class ServerComm {
         ServerComm.ajaxPost(data, callback)
     }
 
+    static sendCheckpoint(user, gameName, opName, x, y, phase, callback) {
+        let data = {
+            id: user,
+            game: gameName,
+            op: opName,
+            data: {x, y, phase}
+        }
+        ServerComm.ajaxPost(data, callback)
+    }
+
     static ajaxPost(data, callback) {
         let url = 'http://localhost:8081/game/profile'
         $.post(url, JSON.stringify(data))
