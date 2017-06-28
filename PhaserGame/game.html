@@ -20,8 +20,11 @@
     if (resp['response'] == 'error'){
       console.log(resp['data'])
     } else {
+      console.log('Entrei')
       var formLogin = document.getElementById('form-login')
-      formLogin.display = 'none'
+      formLogin.style.display = 'none'
+      var confirmedLogin = document.getElementById('label-logged-in')
+      confirmedLogin.style.display = 'block'
       Config.USERNAME = user
     }
   }
