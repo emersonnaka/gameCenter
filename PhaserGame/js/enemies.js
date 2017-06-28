@@ -4,7 +4,7 @@ class Snake extends Phaser.Sprite {
         this.game.physics.arcade.enable(this)
         this.body.allowGravity = false
         this.autoCull = true
-        this.body.setSize(48, 17, 3, 15)
+        this.body.setSize(49, 17, 9, 18)
         this.body.immovable = true // kinematic
 
         this.scale.setTo(1.3, 1.3)
