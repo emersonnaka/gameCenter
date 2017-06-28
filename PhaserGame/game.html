@@ -20,6 +20,8 @@
     if (resp['response'] == 'error'){
       console.log(resp['data'])
     } else {
+      var formLogin = document.getElementById('form-login')
+      formLogin.display = 'none'
       Config.USERNAME = user
     }
   }
