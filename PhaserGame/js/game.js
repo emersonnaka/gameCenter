@@ -135,7 +135,9 @@ class PlayState extends Phaser.State {
 	}
 
 	createPlayer() {
-		this.player = new Player(this.game, this.keys, 30, 900, 'character')
+        this.xSave = 30
+        this.ySave = 900
+		this.player = new Player(this.game, this.keys, this.xSave, this.ySave, 'character')
 		this.game.add.existing(this.player)
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1)
 	}
@@ -199,8 +201,8 @@ class PlayState extends Phaser.State {
 	}
 
 	playerDied() {
-		this.player.x = 30
-		this.player.y = 900
+		this.player.x = this.xSave
+		this.player.y = this.ySave
 		this.camera.shake(0.02, 200)
 
 		this.subLife(this.lifes)
@@ -218,11 +220,11 @@ class PlayState extends Phaser.State {
 	}
 
     checkpoint(player, check) {
-        let x = check.x
-        let y = check.y
+        this.xSave = check.x
+        this.ySave = check.y
         check.destroy()
         
-        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', x, y, Config.LEVEL,
+        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', this.xSave, this.ySave, Config.LEVEL,
             (response) => this.onServerResponse(response))
     }
 
