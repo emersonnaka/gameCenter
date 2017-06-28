@@ -6,6 +6,7 @@ Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
 Config.LEVEL = 1
 Config.SCORE = 0
+Config.GAMENAME = 'irineus-adventure'
 Config.USERNAME
 
 class Game extends Phaser.Game {
@@ -63,6 +64,7 @@ class PlayState extends Phaser.State {
 
 		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/golds.png', 32, 32)
 		this.game.load.spritesheet('lifes', Config.ASSETS + 'objects/lifes.png', 32, 32)
+        this.game.load.spritesheet('checkpoint', Config.ASSETS + 'objects/Mushroom_2.png', 42, 42)
 
 		this.game.load.image('trophy', Config.ASSETS + 'objects/trophy.png')
 	}
@@ -115,6 +117,7 @@ class PlayState extends Phaser.State {
 		this.map = this.game.add.tilemap('level1')
         this.map.addTilesetImage('tiles')
         this.map.addTilesetImage('objects')
+        this.map.addTilesetImage('checkpoint')
 
         this.mapLayer = this.map.createLayer('Tile Layer')
 
@@ -143,6 +146,9 @@ class PlayState extends Phaser.State {
 
 		this.life = this.game.add.group()
 		this.map.createFromObjects('Collection Layer', 473, 'lifes', 0, true, false, this.life, Life)
+
+        this.check = this.game.add.group()
+        this.map.createFromObjects('Collection Layer', 479, 'checkpoint', 0, true, false, this.check, Checkpoint)
 	}
 
 	createHud() {
@@ -166,6 +172,8 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.collide(this.player, this.trapsLayer, this.playerDied, null, this)
 
         this.game.physics.arcade.overlap(this.player, this.life, this.collectLife, null, this)
+
+        this.game.physics.arcade.overlap(this.player, this.check, this.checkpoint, null, this)
 	}
 
 	collectCoin(player, coin) {
@@ -208,6 +216,23 @@ class PlayState extends Phaser.State {
 		this.player.subLife()
 		this.lifeText.text = 'Irineu: ' + this.player.lifes
 	}
+
+    checkpoint(player, check) {
+        let x = check.x
+        let y = check.y
+        check.destroy()
+        
+        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', x, y, `phase${Config.LEVEL}`,
+            (response) => this.onServerResponse(response))
+    }
+
+    onServerResponse(response) {
+        if (response['response'] != 'ok') {
+            console.log("ERRO de comunicao com o servidor")
+            return
+        }
+        console.log('save-state')
+    }
 
 	loadNextLevel() {
         if (!this.levelCleared) {
