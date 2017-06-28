@@ -110,12 +110,12 @@ Templates.profileItem = Handlebars.compile(
 class ServerComm {
     static addTrophy(data, callback) {
         ServerComm.sendRequestTrophy(
-            'nelson', 'irineus-adventure', 'add-trophy', data, callback)
+            'luisao', 'irineus-adventure', 'add-trophy', data, callback)
     }
 
     static listTrophy(callback) {
         ServerComm.sendRequestTrophy(
-            'nelson', 'irineus-adventure', 'list-trophy', '', callback)
+            'luisao', 'irineus-adventure', 'list-trophy', '', callback)
     }
 
     static clearTrophy(callback) {
@@ -141,7 +141,6 @@ class ServerComm {
             op: opName,
             data: {password}
         }
-        console.log("To aca")
         ServerComm.ajaxPost(data, callback)
     }
 
@@ -156,7 +155,7 @@ class ServerComm {
     }
 
     static ajaxPost(data, callback) {
-        let url = 'http://192.168.25.183:8081/game/profile'
+        let url = 'http://localhost:8081/game/profile'
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
                 console.log(data)
