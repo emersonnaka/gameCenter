@@ -612,7 +612,7 @@
                  "name":"",
                  "properties":
                     {
-                     "targetX":"273",
+                     "targetX":"-273",
                      "targetY":"546"
                     },
                  "rotation":0,
@@ -680,15 +680,15 @@
                  "name":"",
                  "properties":
                     {
-                     "targetX":"273",
+                     "targetX":"-273",
                      "targetY":"546"
                     },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":3696,
-                 "y":546
+                 "x":3689.33333333333,
+                 "y":547.333333333333
                 }, 
                 {
                  "gid":483,
