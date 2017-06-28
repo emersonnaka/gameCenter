@@ -288,24 +288,26 @@ public class DAO {
     	}
     }
     
-    public String clearTrophy(){
+    public String clearTrophy(String username, String gamename){
     	String resp = null;
     	
         try {
         	System.out.println("Limpando troféus salvos");
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            Statement statement = connectionDatabase.createStatement();
-            String sql = "TRUNCATE TABLE " + trophyTable;
-            statement.execute(sql);
-            statement.close();
-            System.out.println("Troféus excluídos com sucesso!");
+            String sql = "DELETE FROM " + trophyTable + " WHERE username = ? AND nameGame = ?";
+            PreparedStatement preparedStmt = connectionDatabase.prepareStatement(sql);
+            preparedStmt.setString(1, username);
+            preparedStmt.setString(2, gamename);
+            preparedStmt.execute();
+            preparedStmt.close();
+            System.out.println("Troféus de " + username + " no jogo " + gamename + " excluídos com sucesso!");
             resp = "{\"response\":\"ok\",\"data\":\"\"}";
             return resp;
 
         } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
-            System.out.println("Troféu não inserido");
+            System.out.println("Troféus não removidos");
             return resp;
         }
     }

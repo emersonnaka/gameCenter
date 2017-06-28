@@ -254,7 +254,9 @@ final class RequesteHandle implements Runnable {
         		break;
         		
         	case "clear-trophy":
-        		response = dao.clearTrophy();
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		response = dao.clearTrophy(username, game);
         		break;
         		
         	case "save-state":

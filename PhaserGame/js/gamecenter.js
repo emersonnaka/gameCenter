@@ -23,13 +23,6 @@ class Trophy extends Phaser.Sprite {
             (response) => this.updateAchievedTrophies(response) )
     }
 
-    verifyProfile(json){
-        let resp = JSON.parse(JSON.stringify(json))
-        if (resp['response'] == 'error'){
-            console.log(resp['data'])
-        }
-    }
-
     updateAchievedTrophies(json) {
         // coloca os nomes dos trofeus na lista de controle: this.achieved
         let list = JSON.parse(JSON.stringify(json))
@@ -110,17 +103,17 @@ Templates.profileItem = Handlebars.compile(
 class ServerComm {
     static addTrophy(data, callback) {
         ServerComm.sendRequestTrophy(
-            'luisao', 'irineus-adventure', 'add-trophy', data, callback)
+            Config.USERNAME, Config.GAMENAME, 'add-trophy', data, callback)
     }
 
     static listTrophy(callback) {
         ServerComm.sendRequestTrophy(
-            'luisao', 'irineus-adventure', 'list-trophy', '', callback)
+            Config.USERNAME, Config.GAMENAME, 'list-trophy', '', callback)
     }
 
     static clearTrophy(callback) {
         ServerComm.sendRequestTrophy(
-            'john_doe', 'clear-trophy', '', callback)
+            Config.USERNAME, 'clear-trophy', '', callback)
     }
 
     // metodo generico a ser usado por todas as 
