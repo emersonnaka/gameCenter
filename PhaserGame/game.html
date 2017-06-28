@@ -25,6 +25,7 @@
       formLogin.style.display = 'none'
       var confirmedLogin = document.getElementById('label-logged-in')
       confirmedLogin.style.display = 'block'
+      document.getElementById('confirmed-text').innerHTML = 'Logged in as <strong>' + user + '</strong>'
       Config.USERNAME = user
     }
   }
