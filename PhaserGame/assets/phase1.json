@@ -730,6 +730,193 @@
                  "width":42,
                  "x":2415,
                  "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":131,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-252",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":420,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":132,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-252",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2352,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":133,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-252",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2877,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":134,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-210",
+                     "targetY":"714"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2814,
+                 "y":714
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":135,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-231",
+                     "targetY":"357"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2604,
+                 "y":357
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":137,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-273",
+                     "targetY":"147"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1638,
+                 "y":147
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":138,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-252",
+                     "targetY":"714"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2205,
+                 "y":714
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":139,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-231",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1554,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":140,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-231",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1239,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":141,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-168",
+                     "targetY":"987"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":945,
+                 "y":987
+                }, 
+                {
+                 "gid":483,
+                 "height":32,
+                 "id":142,
+                 "name":"",
+                 "properties":
+                    {
+                     "targetX":"-273",
+                     "targetY":"672"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":3759,
+                 "y":672
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -738,7 +925,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":95,
+ "nextobjectid":143,
  "orientation":"orthogonal",
  "properties":
     {
@@ -830,6 +1017,23 @@
          "tilecount":1,
          "tileheight":42,
          "tilewidth":42,
+         "transparentcolor":"#ff00ff"
+        }, 
+        {
+         "firstgid":480,
+         "image":"objects\/snake.png",
+         "imageheight":32,
+         "imagewidth":256,
+         "margin":0,
+         "name":"snake",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":4,
+         "tileheight":32,
+         "tilewidth":64,
          "transparentcolor":"#ff00ff"
         }],
  "tilewidth":21,
