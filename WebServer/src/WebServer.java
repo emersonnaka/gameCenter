@@ -264,7 +264,7 @@ final class RequesteHandle implements Runnable {
         		jsonData = obj.getAsJsonObject("data");
         		int x = jsonData.get("x").getAsInt();
         		int y = jsonData.get("y").getAsInt();
-        		int fase = jsonData.get("fase").getAsInt();
+        		int fase = jsonData.get("phase").getAsInt();
         		response = dao.saveState(x, y, fase, username, game);
         		break;
         		

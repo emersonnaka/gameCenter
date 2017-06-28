@@ -57,7 +57,7 @@ public class DAO {
     	createStateTable.append("CREATE TABLE IF NOT EXISTS " + stateTable + "(");
     	createStateTable.append("x int(11) NOT NULL,");
     	createStateTable.append("y int(11) NOT NULL,");
-    	createStateTable.append("fase int(11) NOT NULL,");
+    	createStateTable.append("phase int(11) NOT NULL,");
     	createStateTable.append("gamename varchar(100) NOT NULL,");
     	createStateTable.append("username varchar(255) NOT NULL,");
     	createStateTable.append("FOREIGN KEY (gamename) REFERENCES Game(name),");
@@ -363,24 +363,24 @@ public class DAO {
         try {
         	Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
-            pst = conexao.prepareStatement("SELECT fase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
+            pst = conexao.prepareStatement("SELECT phase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
             pst.setString(1, username);
             pst.setString(2, gamename);
             rs = pst.executeQuery();
             String aux = "";
             while (rs.next()) {
-                aux += String.valueOf(rs.getInt("fase"));
+                aux += String.valueOf(rs.getInt("phase"));
             }
             if(aux == ""){
             	Statement statement = conexao.createStatement();
-                String sql = "INSERT INTO " + stateTable + " (x, y, fase, gamename, username) VALUES ("+ x + ", " + y + ", " 
+                String sql = "INSERT INTO " + stateTable + " (x, y, phase, gamename, username) VALUES ("+ x + ", " + y + ", " 
                 											  + fase + ",'" + gamename + "','" + username + "')";
                 statement.execute(sql);
                 statement.close();
                 System.out.println("Estado salvo!");
                 return respOk;
             } else {
-            	pst = conexao.prepareStatement("UPDATE " + stateTable + " SET x=?, y=?, fase=? WHERE username=? AND gamename=?");
+            	pst = conexao.prepareStatement("UPDATE " + stateTable + " SET x=?, y=?, phase=? WHERE username=? AND gamename=?");
             	pst.setInt(1, x);
                 pst.setInt(2, y);
                 pst.setInt(3, fase);
@@ -411,7 +411,7 @@ public class DAO {
     		System.out.println("Loading state");
         	Class.forName(driver).newInstance();
             conexao = DriverManager.getConnection(url + dbName, userName, password);
-            pst = conexao.prepareStatement("SELECT x, y, fase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
+            pst = conexao.prepareStatement("SELECT x, y, phase FROM " + stateTable + " WHERE username = ? AND gamename = ?");
             pst.setString(1, username);
             pst.setString(2, gamename);
             rs = pst.executeQuery();
@@ -419,7 +419,7 @@ public class DAO {
             while (rs.next()) {
                 aux = "{\"x\":\"" + String.valueOf(rs.getInt("x"))+"\"";
                 aux += ",\"y\":\"" + String.valueOf(rs.getInt("y"))+"\"";
-                aux += ",\"state\":\"" + String.valueOf(rs.getInt("fase"))+"\"}";
+                aux += ",\"state\":\"" + String.valueOf(rs.getInt("phase"))+"\"}";
             }
             if(aux.isEmpty()){
             	resp = "{\"response\":\"erro\",\"data\":\"\"}";

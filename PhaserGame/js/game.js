@@ -222,7 +222,7 @@ class PlayState extends Phaser.State {
         let y = check.y
         check.destroy()
         
-        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', x, y, `phase${Config.LEVEL}`,
+        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', x, y, Config.LEVEL,
             (response) => this.onServerResponse(response))
     }
 
