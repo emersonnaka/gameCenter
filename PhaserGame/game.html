@@ -7,6 +7,15 @@
     <title>Irineu's Adventure</title>
 </head>
 
+<script type="text/javascript">
+  function salvar(){
+    var user = document.getElementById('input-user').value
+    var pass = document.getElementById('input-pass').value
+    ServerComm.sendQueryProfile(user, 'query-profile', pass,
+        (response) => this.verifyProfile(response))
+  }
+</script>
+
 <body>
 <div class='parallax'></div>
 
@@ -22,11 +31,11 @@
     <!-- form de login -->
     <form class='navbar-form navbar-left' id='form-login'>
       <div class='form-group'>
-        <input type='text' class='form-control' placeholder='Username'>
-        <input type='password' class='form-control' placeholder='Password'>
+        <input id='input-user' type='text' class='form-control' placeholder='Username'>
+        <input id='input-pass' type='password' class='form-control' placeholder='Password'>
       </div>
       <button type='button' class='btn btn-primary'
-              id='form-login-button'>
+              id='form-login-button' onClick = "salvar()">
           <span class='glyphicon glyphicon-log-in'></span>
           Login
       </button>

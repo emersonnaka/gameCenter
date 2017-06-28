@@ -6,6 +6,7 @@ Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
 Config.LEVEL = 1
 Config.SCORE = 0
+Config.USERNAME
 
 class Game extends Phaser.Game {
     constructor() {

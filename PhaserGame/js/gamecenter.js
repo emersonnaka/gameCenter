@@ -23,6 +23,13 @@ class Trophy extends Phaser.Sprite {
             (response) => this.updateAchievedTrophies(response) )
     }
 
+    verifyProfile(json){
+        let resp = JSON.parse(JSON.stringify(json))
+        if (resp['response'] == 'error'){
+            console.log(resp['data'])
+        }
+    }
+
     updateAchievedTrophies(json) {
         // coloca os nomes dos trofeus na lista de controle: this.achieved
         let list = JSON.parse(JSON.stringify(json))
@@ -124,6 +131,15 @@ class ServerComm {
             game: gameName,
             op: opName,
             data: opData
+        }
+        ServerComm.ajaxPost(data, callback)
+    }
+
+    static sendQueryProfile(user, opName, password, callback) {
+        let data = {
+            id: user,
+            op: opName,
+            data: {password}
         }
         ServerComm.ajaxPost(data, callback)
     }
