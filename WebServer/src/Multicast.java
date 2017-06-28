@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,8 @@ public class Multicast {
 	String host;
 	int port;
 	InetAddress group;
-	Map<String, Long> onlineMap;	
+	Map<String, Long> onlineMap;
+	private List<String> hostsList;
 
 	public Multicast() throws IOException, InterruptedException {
 		
@@ -32,6 +36,9 @@ public class Multicast {
 		this.group = InetAddress.getByName(this.host);
 		mSocket = new MulticastSocket(this.port);
 		mSocket.joinGroup(this.group);
+		
+		hostsList = new ArrayList<String>();
+		networkInterfaces();
 		
 		Runnable clientRun = new Runnable() {
 			@Override
@@ -79,6 +86,20 @@ public class Multicast {
 		
 	}
 	
+	private void networkInterfaces() throws SocketException {
+		Enumeration e = NetworkInterface.getNetworkInterfaces();
+		while(e.hasMoreElements())
+		{
+		    NetworkInterface n = (NetworkInterface) e.nextElement();
+		    Enumeration ee = n.getInetAddresses();
+		    while (ee.hasMoreElements())
+		    {
+		        InetAddress i = (InetAddress) ee.nextElement();
+		        hostsList.add(i.getHostAddress());
+		    }
+		}
+	}
+	
 	private void clientMulticast() throws IOException, InterruptedException {
 		final String msg = new String("GameServer");
 		
@@ -100,7 +121,7 @@ public class Multicast {
 			mSocket.receive(msgDataIn);
 			msg = new String(msgDataIn.getData(), 0, msgDataIn.getLength());
 			host = msgDataIn.getAddress().getHostAddress();
-			if(msg.contains("GameServer")) {
+			if(msg.contains("GameServer") && !hostsList.contains(host)) {
 				onlineMap.put(host, Calendar.getInstance().getTimeInMillis());
 				System.out.println("The server " + host + " is connected");
 			}
