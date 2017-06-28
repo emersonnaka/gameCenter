@@ -203,8 +203,6 @@ class PlayState extends Phaser.State {
 	}
 
 	playerDied() {
-		this.player.x = this.xSave
-		this.player.y = this.ySave
 		this.camera.shake(0.02, 200)
 
 		this.subLife(this.lifes)
@@ -213,6 +211,9 @@ class PlayState extends Phaser.State {
 		if(this.player.lifes < 0) {
 			this.game.camera.onFadeComplete.removeAll(this)
         	this.game.state.start('GameOver')
+        } else {
+            this.player.x = this.xSave
+            this.player.y = this.ySave
         }
 	}
 

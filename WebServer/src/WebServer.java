@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.org.glassfish.gmbal.Description;
 
 public final class WebServer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");

@@ -24,14 +24,15 @@ class TitleState extends Phaser.State {
         this.pressStart.y = 300
 
         if(this.hasSave) {
-            this.initSave = this.game.add.text(0, 0, 'Press SPACE to continue', {fontSize: '16px', fill: '#000000'})
+            this.initSave = this.game.add.text(0, 0, 'Press P to continue', {fontSize: '16px', fill: '#000000'})
             this.initSave.anchor.setTo(0.5, 0.5)
             this.initSave.x = this.game.width/2
             this.initSave.y = 400
 
             let spaceButton = this.game.input.keyboard.addKey(
-                Phaser.Keyboard.SPACE)
+                Phaser.Keyboard.P)
             spaceButton.onDown.add(this.continueGame, this)
+            this.hasSave = false
         }
 
         let fullScreenButton = this.game.input.keyboard.addKey(
@@ -56,7 +57,7 @@ class TitleState extends Phaser.State {
         Config.X = this.xSave
         Config.Y = this.ySave
         Config.LEVEL = this.phaseSave
-        startFade()
+        this.startFade()
     }
 
     startFade() {
@@ -88,7 +89,10 @@ class TitleState extends Phaser.State {
             this.hasSave = true
             this.xSave = response['data']['x']
             this.ySave = response['data']['y']
-            this.phaseSave = response['data']['phase']
+            this.phaseSave = response['data']['state']
+            console.log(this.xSave)
+            console.log(this.ySave)
+            console.log(this.phaseSave)
         }
     }
 
