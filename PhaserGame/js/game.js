@@ -67,6 +67,7 @@ class PlayState extends Phaser.State {
 		this.game.load.spritesheet('coin', Config.ASSETS + 'objects/golds.png', 32, 32)
 		this.game.load.spritesheet('lifes', Config.ASSETS + 'objects/lifes.png', 32, 32)
         this.game.load.spritesheet('checkpoint', Config.ASSETS + 'objects/Mushroom_2.png', 42, 42)
+        this.game.load.spritesheet('snake', Config.ASSETS + 'objects/snake.png', 64, 32)
 
 		this.game.load.image('trophy', Config.ASSETS + 'objects/trophy.png')
 	}
@@ -90,6 +91,7 @@ class PlayState extends Phaser.State {
         this.createMap()
         this.createPlayer()
         this.createCollections()
+        this.createEnemies()
         this.createHud()
 
         this.trophy = new Trophy(this.game)
@@ -155,6 +157,12 @@ class PlayState extends Phaser.State {
         this.map.createFromObjects('Collection Layer', 479, 'checkpoint', 0, true, false, this.check, Checkpoint)
 	}
 
+    createEnemies() {
+        this.snakes = this.game.add.group()
+        this.map.createFromObjects('Collection Layer', 483, 'snake', 0, true, false, this.snakes, Snake)
+        this.snakes.forEach( (Snake) => Snake.start() )
+    }
+
 	createHud() {
 		this.headImage = this.game.add.image(0, 0, 'head')
 		this.headImage.fixedToCamera = true
@@ -178,6 +186,8 @@ class PlayState extends Phaser.State {
         this.game.physics.arcade.overlap(this.player, this.life, this.collectLife, null, this)
 
         this.game.physics.arcade.overlap(this.player, this.check, this.checkpoint, null, this)
+
+        this.game.physics.arcade.overlap(this.player, this.snakes, this.playerDied, null, this)
 	}
 
 	collectCoin(player, coin) {
