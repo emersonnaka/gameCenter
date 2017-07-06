@@ -6,6 +6,7 @@ Config.ANTIALIAS = true
 Config.ASSETS = 'assets/'
 Config.LEVEL = 1
 Config.SCORE = 0
+Config.LIFE = 0
 Config.GAMENAME = 'irineus-adventure'
 Config.X = 30
 Config.Y = 900
@@ -56,10 +57,14 @@ class GameState extends Phaser.State {
 
 class PlayState extends Phaser.State {
 	preload() {
+
+
 		this.game.load.tilemap('level1', Config.ASSETS + `phase${Config.LEVEL}.json`, null, Phaser.Tilemap.TILED_JSON)
-		this.game.load.image('tiles', Config.ASSETS + 'tiles/tiles.png')
-		this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
-		this.game.load.image('background', Config.ASSETS + 'background.png')
+
+        this.game.load.image('tiles', Config.ASSETS + 'tiles/tiles.png')
+        this.game.load.image('objects', Config.ASSETS + 'objects/objects.png')
+        this.game.load.image('background', Config.ASSETS + 'background.png')
+
 
 		this.game.load.image('head', Config.ASSETS + 'character/HeadHUD.png')
 		this.game.load.spritesheet('character', Config.ASSETS + 'character/character.png', 50, 60)
@@ -85,7 +90,8 @@ class PlayState extends Phaser.State {
 
         this.keys = this.game.input.keyboard.createCursorKeys()
         this.game.physics.arcade.gravity.y = 550
-        this.score = 0
+        this.score = Config.SCORE
+        this.lifes = Config.LIFE
 
         let screenshotButton = this.game.input.keyboard.addKey(Phaser.Keyboard.P)
         screenshotButton.onDown.add(this.takeScreenShot, this)
@@ -103,6 +109,7 @@ class PlayState extends Phaser.State {
         this.map.setTileIndexCallback(240, this.loadNextLevel, this)
         this.levelCleared = false
         this.addScore(0)
+        this.addLife(0)
 	}
 
 	toogleFullScreen() {
@@ -116,7 +123,7 @@ class PlayState extends Phaser.State {
 	takeScreenShot() {
 		let imgData = this.game.canvas.toDataURL()
         $('#div-screenshot').append(`<img src=${imgData} alt='game screenshot' class='screenshot'>`)
-        console.log('cade o print?')
+        this.trophy.saveMedia(imgData)
 	}
 
 	createMap() {
@@ -218,21 +225,24 @@ class PlayState extends Phaser.State {
 
 	collectLife(player, life) {
 		life.destroy()
-		this.addLife()
+		this.addLife(life.lifes)
 	}
 
 	addLife(amount) {
-		this.player.addLife()
-		this.lifeText.text = 'Irineu: ' + this.player.lifes
+		this.lifes += amount
+		this.lifeText.text = 'Irineu: ' + this.lifes
 	}
 
 	playerDied() {
 		this.camera.shake(0.02, 200)
 
-		this.subLife(this.lifes)
+		this.subLife()
 		this.trophy.show('first death')
 
-		if(this.player.lifes < 0) {
+		if(this.lifes < 0) {
+            Config.LIFE = 0
+            this.lifes = 0
+            this.levelCleared = true
 			this.game.camera.onFadeComplete.removeAll(this)
         	this.game.state.start('GameOver')
         } else {
@@ -242,8 +252,8 @@ class PlayState extends Phaser.State {
 	}
 
 	subLife() {
-		this.player.subLife()
-		this.lifeText.text = 'Irineu: ' + this.player.lifes
+		this.lifes -= 1
+		this.lifeText.text = 'Irineu: ' + this.lifes
 	}
 
     checkpoint(player, check) {
@@ -251,7 +261,7 @@ class PlayState extends Phaser.State {
         this.ySave = check.y
         check.destroy()
         
-        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'save-state', this.xSave, this.ySave, Config.LEVEL,
+        ServerComm.sendCheckpoint(Config.USERNAME, Config.GAMENAME, 'save-state', this.xSave, this.ySave, Config.LEVEL,
             (response) => this.onServerResponse(response))
     }
 
@@ -274,6 +284,7 @@ class PlayState extends Phaser.State {
     changeLevel() {
         Config.LEVEL += 1
         Config.SCORE = this.score
+        Config.LIFE = this.lifes
         this.game.camera.onFadeComplete.removeAll(this)// bug
         if (Config.LEVEL <= 3)
             this.game.state.restart()

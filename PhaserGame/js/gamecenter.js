@@ -21,6 +21,9 @@ class Trophy extends Phaser.Sprite {
         // listar os trofeus no servidor e atualizar this.achieved
         ServerComm.listTrophy( 
             (response) => this.updateAchievedTrophies(response) )
+
+        ServerComm.listMedia( 
+            (response) => this.updateAchievedMedia(response) )
     }
 
     updateAchievedTrophies(json) {
@@ -29,6 +32,13 @@ class Trophy extends Phaser.Sprite {
         for (let t of list) {
             this.achieved.push(t['name'])
             this.addTrophyOnPage(t['name'])
+        }
+    }
+
+    updateAchievedMedia(json) {
+        let list = JSON.parse(JSON.stringify(json))
+        for (let t of list) {
+            this.addMediaOnPage(t['src'])
         }
     }
 
@@ -86,9 +96,29 @@ class Trophy extends Phaser.Sprite {
         $('#div-trophy').append(html)
     }
 
+    addMediaOnPage(mediaSrc) {
+
+        $('#screenshots-empty-label').hide()
+
+        $('#div-screenshot').append(
+            `<img src=${mediaSrc} alt='game screenshot' class='screenshot'>`
+        )  
+    }
+
     removePanel() {
         let p = this.panels.shift()
         p.destroy()
+    }
+
+    saveMedia(midia, callback){
+        let data = {
+            id: Config.USERNAME,
+            game: Config.GAMENAME,
+            op: 'save-media',
+            data: {mimeType: 'image/jpg', src: midia}
+        }
+        console.log(data)
+        ServerComm.ajaxPost(data, callback)
     }
 }
 
@@ -101,6 +131,21 @@ Templates.profileItem = Handlebars.compile(
 )
 
 class ServerComm {
+
+    static listMedia(callback) {
+        ServerComm.sendRequestMedia(
+            Config.USERNAME, Config.GAMENAME, 'list-media', callback)
+    }
+
+    static sendRequestMedia(user, gameName, opName, callback) {
+        let data = {
+            id: user,
+            game: gameName,
+            op: opName,
+        }
+        ServerComm.ajaxPost(data, callback)
+    }
+
     static addTrophy(data, callback) {
         ServerComm.sendRequestTrophy(
             Config.USERNAME, Config.GAMENAME, 'add-trophy', data, callback)
@@ -148,7 +193,7 @@ class ServerComm {
     }
 
     static ajaxPost(data, callback) {
-        let url = 'http://localhost:8081/game/profile'
+        let url = '/game/profile'
         $.post(url, JSON.stringify(data))
             .done(function(data, status) {
                 console.log(data)

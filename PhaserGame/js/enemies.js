@@ -18,8 +18,8 @@ class Snake extends Phaser.Sprite {
         this.targetY -= this.height
 
         let tweenA = this.game.add.tween(this)
-            .to( { x: this.targetX, y: this.targetY }, 4000)
-            .to( { x: this.x, y: this.y }, 4000)
+            .to( { x: this.targetX, y: this.targetY}, 4000)
+            .to( { x: this.x, y: this.y}, 4000)
             .loop(-1)
             .start()
     }
@@ -31,7 +31,7 @@ class Bat extends Phaser.Sprite {
         this.game.physics.arcade.enable(this)
         this.body.allowGravity = false
         this.autoCull = true
-        this.body.setSize(49, 17, 9, 18)
+        this.body.setSize(25, 18, 5, 13)
         this.body.immovable = true // kinematic
 
         this.scale.setTo(1.3, 1.3)

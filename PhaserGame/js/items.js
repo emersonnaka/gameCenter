@@ -17,7 +17,7 @@ class Life extends Phaser.Sprite {
         this.game.physics.arcade.enable(this)
         this.body.allowGravity = false
         this.autoCull = true
-        this.life = 1
+        this.lifes = 1
 
         this.animations.add('spin', [0, 1, 2, 3, 4, 5], 10, true)
         this.animations.play('spin')

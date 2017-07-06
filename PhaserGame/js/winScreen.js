@@ -6,6 +6,7 @@ class WinState extends Phaser.State {
 	}
 
 	create() {
+        super.create()
 		this.bg = this.game.add.image(0, 0, 'titleScreen')
 		this.bg.anchor.setTo(0.2, 0.3)
 

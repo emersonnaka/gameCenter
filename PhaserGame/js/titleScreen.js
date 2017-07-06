@@ -5,11 +5,13 @@ class TitleState extends Phaser.State {
         this.hasSave = false
         this.game.load.image('titleScreen', Config.ASSETS + 'titleScreen.jpg')
         this.game.load.image('title',Config.ASSETS + 'IrineusAdventure.png')
-        ServerComm.sendCheckpoint('luisao', Config.GAMENAME, 'load-state', 0, 0, 0,
+        ServerComm.sendCheckpoint(Config.USERNAME, Config.GAMENAME, 'load-state', 0, 0, 0,
             (response) => this.verifyState(response))
     }
 
     create() {
+        super.create()
+
         this.bg = this.game.add.image(0, 0, 'titleScreen')
         this.bg.anchor.setTo(0, 0)
 

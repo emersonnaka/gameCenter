@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -38,62 +39,13 @@ public final class WebServer {
         log("Servidor Web iniciado.\n Porta:" + port + "\n Pasta WWW:" + dirBase);
         ServerSocket serverSocket = new ServerSocket(port); // Cria um servidor de socket
         
-        //Descomentar para fazer a comunicação entre pcs na rede
-        /*String targetURL = "http://192.168.43.133:8081";
-        String urlParameters = "{\"id\":\"1\",\"op\":\"list-trophy\", \"data\":\"\"}";
-        executePost(targetURL, urlParameters);*/
-        
         Multicast multicast = new Multicast();
         
         while (true) { // Loop infinito aguardando conexões
             Socket socket = serverSocket.accept(); // Escuta o socket
-            new Thread(new RequesteHandle(socket, dirBase)).run();
+            new Thread(new RequesteHandle(socket, dirBase, multicast)).run();
         }
     }
-    /*
-    public static String executePost(String targetURL, String urlParameters) {
-    	  HttpURLConnection connection = null;
-
-    	  try {
-    	    //Create connection
-    	    URL url = new URL(targetURL);
-    	    connection = (HttpURLConnection) url.openConnection();
-    	    connection.setRequestMethod("POST");
-    	    connection.setRequestProperty("Content-Type", 
-    	        "application/x-www-form-urlencoded");
-
-    	    connection.setRequestProperty("Content-Length", 
-    	        Integer.toString(urlParameters.getBytes().length));
-    	    connection.setRequestProperty("Content-Language", "en-US");  
-
-    	    connection.setUseCaches(false);
-    	    connection.setDoOutput(true);
-
-    	    //Send request
-    	    DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
-    	    wr.writeBytes(urlParameters);
-    	    wr.close();
-
-    	    //Get Response  
-    	    InputStream is = connection.getInputStream();
-    	    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-    	    StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
-    	    String line;
-    	    while ((line = rd.readLine()) != null) {
-    	      response.append(line);
-    	      response.append('\r');
-    	    }
-    	    rd.close();
-    	    return response.toString();
-    	  } catch (Exception e) {
-    	    e.printStackTrace();
-    	    return null;
-    	  } finally {
-    	    if (connection != null) {
-    	      connection.disconnect();
-    	    }
-    	  }
-    	}*/
 }
 
 final class RequesteHandle implements Runnable {
@@ -107,14 +59,17 @@ final class RequesteHandle implements Runnable {
     private String requestPath;
     private HashMap<String, String> requestHeader;
     private HashMap<String, String> cookieParams;
+    private Multicast multicast;
+    private Map<String, Long> onlineMap;
 
-    public RequesteHandle(Socket socket, String diretorioBase) throws Exception {
+    public RequesteHandle(Socket socket, String diretorioBase, Multicast multicast) throws Exception {
         this.socket = socket;
         this.input = socket.getInputStream();
         //this.inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.output = socket.getOutputStream();
-  
+        this.multicast = multicast;
         this.dirBase = diretorioBase;
+        this.onlineMap = this.multicast.getOnlineMap();
     }
     
     @Override
@@ -154,7 +109,7 @@ final class RequesteHandle implements Runnable {
         
     }
 
-    private byte[] responsePost(HashMap<String, String> requestHeader) throws IOException{
+    private byte[] responsePost(HashMap<String, String> requestHeader) throws IOException, InterruptedException{
     	String[] getParams = requestHeader.get("POST").split(" ");
 
         if (getParams.length != 2) {
@@ -171,7 +126,7 @@ final class RequesteHandle implements Runnable {
         }
 	}
 
-	private byte[] response_postJson(HashMap<String, String> requestHeader) throws IOException{
+	private byte[] response_postJson(HashMap<String, String> requestHeader) throws IOException, InterruptedException{
 		System.out.println("-------- responde_postJson() --------");
         String contentType = "application/json";
         byte[] content = postJson(requestHeader);
@@ -188,7 +143,7 @@ final class RequesteHandle implements Runnable {
         return result.toByteArray();
 	}
 
-	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException{
+	private byte[] postJson(HashMap<String, String> requestHeader) throws IOException, InterruptedException{
 		DAO dao = new DAO();
 		
 		String requestJson = requestHeader.get("Json");
@@ -203,6 +158,7 @@ final class RequesteHandle implements Runnable {
 		String password;
 		String game;
         String description;
+        String mimeType;
 		
         op = obj.get("op").getAsString();
 
@@ -220,14 +176,19 @@ final class RequesteHandle implements Runnable {
         		jsonData = obj.getAsJsonObject("data");
         		password = jsonData.get("password").getAsString();
         		response = dao.queryProfile(username, password);
+        		if(response.contains("error")){
+        			for (Map.Entry<String, Long> entry : onlineMap.entrySet()) {
+        				String key = entry.getKey();
+        				multicast.sendRequest(requestJson, key);
+        			}   
+        		}
         		break;
         	case "add-game":
         		username = obj.get("id").getAsString();
-        		game = obj.get("game").getAsString();
         		jsonData = obj.getAsJsonObject("data");
         		name = jsonData.get("name").getAsString();
         		description = jsonData.get("description").getAsString();
-        		response = dao.addGame(username, game, name, description);
+        		response = dao.addGame(name, description, username);
         		break;
         	case "add-trophy":
         		username = obj.get("id").getAsString();
@@ -243,7 +204,7 @@ final class RequesteHandle implements Runnable {
         	case "list-trophy":
         		username = obj.get("id").getAsString();
         		game = obj.get("game").getAsString();
-        		response = dao.listTrophy(username,game);
+        		response = dao.listTrophy(username,game);        			
         		break;
         		
         	case "get-trophy":
@@ -273,6 +234,22 @@ final class RequesteHandle implements Runnable {
         		username = obj.get("id").getAsString();
         		game = obj.get("game").getAsString();
         		response = dao.loadState(username, game);
+        		break;
+        		
+        	case "save-media":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		jsonData = obj.getAsJsonObject("data");
+        		mimeType = jsonData.get("mimeType").getAsString();
+        		String src = jsonData.get("src").getAsString();
+        		response = dao.saveMedia(username, game, mimeType, src);
+        		
+        		break;
+        	
+        	case "list-media":
+        		username = obj.get("id").getAsString();
+        		game = obj.get("game").getAsString();
+        		response = dao.listMedia(username, game);
         }
         return response.getBytes();
 	}

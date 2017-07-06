@@ -6,6 +6,8 @@ class GameOverState extends Phaser.State {
     }
 
     create() {
+        super.create()
+
         this.imgGameOver = this.game.add.image(0, 0, 'gameOverScreen')
         this.imgGameOver.anchor.setTo(0.5, 0.5)
         this.imgGameOver.x = this.game.width/2

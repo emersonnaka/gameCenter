@@ -87,11 +87,11 @@ public class Multicast {
 	}
 	
 	private void networkInterfaces() throws SocketException {
-		Enumeration e = NetworkInterface.getNetworkInterfaces();
+		Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 		while(e.hasMoreElements())
 		{
 		    NetworkInterface n = (NetworkInterface) e.nextElement();
-		    Enumeration ee = n.getInetAddresses();
+		    Enumeration<InetAddress> ee = n.getInetAddresses();
 		    while (ee.hasMoreElements())
 		    {
 		        InetAddress i = (InetAddress) ee.nextElement();
@@ -100,7 +100,7 @@ public class Multicast {
 		}
 	}
 	
-	private void clientMulticast() throws IOException, InterruptedException {
+	public void clientMulticast() throws IOException, InterruptedException {
 		final String msg = new String("GameServer");
 		
 		while(true) {
@@ -110,6 +110,7 @@ public class Multicast {
 			TimeUnit.SECONDS.sleep(20);
 		}
 	}
+
 	
 	private void serverMulticast() throws IOException, InterruptedException {
 		String msg = new String();
@@ -155,7 +156,15 @@ public class Multicast {
 			TimeUnit.SECONDS.sleep(5);
 		}
 	}
+
+	public void sendRequest(String request, String key){
+		System.out.println("Fazer");
+	}
 	
+	public Map<String, Long> getOnlineMap() {
+		return onlineMap;
+	}
+
 	public static void main(String args[]) throws NumberFormatException, IOException, InterruptedException {
 		new Multicast();
 	}

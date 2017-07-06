@@ -40,10 +40,12 @@ public class DAO {
     	createMediaTable.append("CREATE TABLE IF NOT EXISTS " + mediaTable + "(");
     	createMediaTable.append("id int(11) NOT NULL AUTO_INCREMENT,");
     	createMediaTable.append("mimeType varchar(50) NOT NULL,");
-    	createMediaTable.append("src varchar(255) NOT NULL,");
-    	createMediaTable.append("name varchar(100) NOT NULL,");
+    	createMediaTable.append("src longtext NOT NULL,");
+    	createMediaTable.append("gamename varchar(100) NOT NULL,");
+    	createMediaTable.append("username varchar(255) NOT NULL,");
     	createMediaTable.append("PRIMARY KEY (id),");
-    	createMediaTable.append("FOREIGN KEY (name) REFERENCES Game(name))");
+    	createMediaTable.append("FOREIGN KEY (gamename) REFERENCES Game(name),");
+    	createMediaTable.append("FOREIGN KEY (username) REFERENCES Profile(username))");
     	
     	StringBuilder createProfileTable = new StringBuilder();
     	createProfileTable.append("CREATE TABLE IF NOT EXISTS " + profileTable + "(");
@@ -134,6 +136,8 @@ public class DAO {
     	String respOk = "";
     	String respErr = "{\"response\":\"error\", \"data\":\"Alguma exceção não esperada\"}";
     	String respErrSenha = "{\"response\":\"error\", \"data\":\"Usuário ou senha inválidos\"}";
+    	Date date = new Date();
+    	String lastLogin = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
     	
     	try{
     		System.out.println("Procurando profile");
@@ -152,6 +156,10 @@ public class DAO {
             	return respErrSenha;
             } else {
             	respOk = "{\"response\":\"ok\", \"data\":"+ aux + "}";
+            	pst = connectionDatabase.prepareStatement("UPDATE " + profileTable + " SET lastLogin=? WHERE username=?");
+            	pst.setString(1, lastLogin);
+                pst.setString(2, username);
+                pst.executeUpdate();
                 return respOk;
             }
     	} catch (Exception ex){
@@ -160,7 +168,7 @@ public class DAO {
     	}    	
     }
     
-    public String addGame(String username, String game, String name, String description){
+    public String addGame(String gamename, String description, String username){
 
     	PreparedStatement pst = null;
     	ResultSet rs = null;
@@ -184,7 +192,7 @@ public class DAO {
 	        } else {
 	        	pst = connectionDatabase.prepareStatement("SELECT name FROM " + gameTable + " WHERE username = ? AND name = ?");
 		        pst.setString(1, username);
-		        pst.setString(2, game);
+		        pst.setString(2, gamename);
 		        rs = pst.executeQuery();
 		        aux = null;
 		        while (rs.next()) {
@@ -193,7 +201,7 @@ public class DAO {
 
 		        if(aux == null){
 		        	Statement statement = connectionDatabase.createStatement();
-		        	String sql = "INSERT INTO " + gameTable + " (name, description, username) VALUES ('" + name + "', '" 
+		        	String sql = "INSERT INTO " + gameTable + " (name, description, username) VALUES ('" + gamename + "', '" 
 		        					+ description + "', '" + username + "')";
 		        	System.out.println("INSERINDO JOGO");
 		        	statement.execute(sql);
@@ -312,7 +320,7 @@ public class DAO {
         }
     }
     
-    public String listTrophy(String username, String namegame) {
+    public String listTrophy(String username, String gamename) {
     	PreparedStatement pst = null;
     	ResultSet rs = null;
     	List<String> respAux = new ArrayList<String>();    
@@ -323,11 +331,23 @@ public class DAO {
     		System.out.println("Listando Troféus");
         	Class.forName(driver).newInstance();
             connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
-            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE username = ? AND nameGame = ?");
+            
+            //verificando se existe o jogo pro jogador, caso não, adiciona o jogo pra ele
+            pst = connectionDatabase.prepareStatement("SELECT name FROM " + gameTable + " WHERE username = ? AND name = ?");
             pst.setString(1, username);
-            pst.setString(2, namegame);
+            pst.setString(2, gamename);
             rs = pst.executeQuery();
             String aux = "";
+            while (rs.next())
+                aux = rs.getString("name");
+            if(aux == "")
+            	addGame(gamename, "Um jogo bem legal", username);
+            
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + trophyTable + " WHERE username = ? AND nameGame = ?");
+            pst.setString(1, username);
+            pst.setString(2, gamename);
+            rs = pst.executeQuery();
+            aux = "";
             while (rs.next()) {
                 aux = "{\"name\":\"" + rs.getString("name")+"\"";
                 aux += ",\"xp\":\"" + String.valueOf(rs.getInt("xp"))+"\"";
@@ -437,60 +457,63 @@ public class DAO {
         }
     }
     
-    /*public static boolean verificaPlayer(int id) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        Class.forName(driver).newInstance();
-        conexao = DriverManager.getConnection(url + dbName, userName, password);
-        pst = conexao.prepareStatement("select idplayer from Player where Player.id = " + "" + id + "");
-        rs = pst.executeQuery();
-
-        if (rs != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }*/
-
-    /*public static String getPlayer() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        Class.forName(driver).newInstance();
-        conexao = DriverManager.getConnection(url + dbName, userName, password);
-        pst = conexao.prepareStatement("select * from Player ");
-
-        rs = pst.executeQuery();
-        String aux = "";
-        while (rs.next()) {
-            aux = "{id:" + String.valueOf(rs.getInt("Player.id"));
-            aux += ", name:" + rs.getString("name");
-            aux += ", email:" + rs.getString("email") + "}";
-        }
-        return aux;
-    }*/
-
-    /*public static boolean atualizarUsuario(int id, String nome, String email) {
-        Connection conexao = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        try {
-            Class.forName(driver).newInstance();
-            conexao = DriverManager.getConnection(url + dbName, userName, password);
-            try (Statement statement = conexao.createStatement()) {
-                String sql = "UPDATE Player SET name='" + nome + "', email='" + email + "' where Player.id = " + id + "";
-                statement.execute(sql);
+    public String saveMedia(String username, String gamename, String mimeType, String src){
+    	String respErr = "{\"response\":\"error\", \"data\":\"\"}";
+    	String respOk = "{\"response\":\"ok\", \"data\":\"\"}";
+    	
+    	try{
+	    	System.out.println("Salvando midia");
+	    	Class.forName(driver).newInstance();
+	        connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+	        Statement statement = connectionDatabase.createStatement();
+	        String sql = "INSERT INTO Media (mimeType,src,gamename,username) VALUES ('" + mimeType + "','" + src + "','" + gamename + "','" + username + "')";
+	        statement.execute(sql);
+	        statement.close();
+	        System.out.println("Midia inserida com sucesso!");
+	        return respOk;
+    	} catch (Exception ex){
+    		System.out.println("Erro : " + ex.getMessage());
+        	return respErr;
+    	}
+    }
+    
+    public String listMedia(String username, String gamename){
+    	PreparedStatement pst = null;
+    	ResultSet rs = null;
+    	List<String> respAux = new ArrayList<String>();    
+    	String resp = "";
+    	System.out.println("Dentro listMedia");
+    	
+    	try {
+    		System.out.println("Listando Mídias");
+        	Class.forName(driver).newInstance();
+            connectionDatabase = DriverManager.getConnection(url + dbName, userName, password);
+            pst = connectionDatabase.prepareStatement("SELECT * FROM " + mediaTable + " WHERE username = ? AND gamename = ?");
+            pst.setString(1, username);
+            pst.setString(2, gamename);
+            rs = pst.executeQuery();
+            String aux = "";
+            while (rs.next()) {
+                aux = "{\"mimeType\":\"" + rs.getString("mimeType")+"\"";
+                aux += ",\"src\":\"" + rs.getString("src") +"\"" + "}";
+                respAux.add(aux);
             }
-            return true;
+            if(respAux.isEmpty()){
+            	resp = "[]";
+            } else {
+	            resp = "[";
+	            for (int i = 0; i < respAux.size(); i++) {
+					if(i+1 == respAux.size())
+						resp += respAux.get(i)+"]";
+					else
+						resp += respAux.get(i) + ", ";
+				}
+            }
+			return resp;
 
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
+        } catch (Exception ex) {
             System.out.println("Erro : " + ex.getMessage());
-            return false;
+			return resp ;
         }
-    }*/
-
+    }
 }

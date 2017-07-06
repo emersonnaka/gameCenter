@@ -1,0 +1,5 @@
+* Jogo sem o server - OK
+
+* Screenshot - OK (OBS: Caso queira conferir, alimentar o banco colocando um profile e um game, media tem relação com os dois e caso não exista alguém, vai dar erro).
+
+*Multicast - Abordagem clientes ativa(OK). A cada requisição queryProfile, se o servidor não obtem o dado, será enviado um Multicast com a requisição recebida, para que assim seja verifica nos outros servidores(FALTOU).
